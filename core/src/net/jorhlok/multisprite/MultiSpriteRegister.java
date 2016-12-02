@@ -2,6 +2,7 @@ package net.jorhlok.multisprite;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,13 +15,18 @@ public class MultiSpriteRegister {
     public Map<String,TexGrid> Image;
     public Map<String,Sprite> Frame;
     public Map<String,AnimSeq> Anim;
+    public Map<Character,TextureRegion> Letters;
     
     public Batch MyBatch;
+    public BitmapFont Font; //assumes monospace font
+    public String DrawableChars;
+    public float TabLength = 4;
     
     public MultiSpriteRegister() {
         Image = new HashMap<String,TexGrid>();
         Frame = new HashMap<String,Sprite>();
         Anim = new HashMap<String,AnimSeq>();
+        Letters = new HashMap<Character,TextureRegion>();
     }
     
     public void newImage(String key, String uri, int tw, int th) {
@@ -44,6 +50,25 @@ public class MultiSpriteRegister {
         }
         for (AnimSeq a : Anim.values())
             a.Generate(Frame);
+        if (Font != null && DrawableChars != null && !DrawableChars.isEmpty()) {
+            BitmapFont.BitmapFontData dat = Font.getData();
+            for (int i=0; i<DrawableChars.length(); ++i) {
+                BitmapFont.Glyph glyph = dat.getGlyph(DrawableChars.charAt(i));
+                if (glyph != null) {
+                    Letters.put(DrawableChars.charAt(i), new TextureRegion(Font.getRegion(glyph.page).getTexture(),glyph.u,glyph.v,glyph.u2,glyph.v2));
+                }
+            }
+        }
+    }
+    
+    public void drawRegion(TextureRegion reg, float x, float y, float sw, float sh, float rot, float cx, float cy) {
+        //For some reson was drawing with width and height swapped and rotated 90 degrees when done normally
+        try {
+        MyBatch.draw(reg, x, y, reg.getRegionHeight()*cx, reg.getRegionWidth()*cy, reg.getRegionHeight(), reg.getRegionWidth(), sw, sh, rot-90, false);
+        } catch (Exception e) {
+            //nothing
+//            System.err.println("Error drawing: " + e.toString()); //debug
+        }
     }
     
     public void draw(String anim, float statetime, float x, float y) {
@@ -59,17 +84,59 @@ public class MultiSpriteRegister {
     } 
     
     public void draw(String anim, float statetime, float x, float y, float sw, float sh, float rot, float cx, float cy) {
-        try {
             TextureRegion reg = Anim.get(anim).getKeyFrame(statetime);
-            //For some reson was drawing with width and height swapped and rotated 90 degrees when done normally
-            MyBatch.draw(reg, x, y, reg.getRegionHeight()*cx, reg.getRegionWidth()*cy, reg.getRegionHeight(), reg.getRegionWidth(), sw, sh, rot-90, false);
-        } catch (Exception e) {
-            //nothing
-            System.err.println("Error drawing: " + e.toString()); //debug
+            drawRegion(reg,x,y,sw,sh,rot,cx,cy);
+
+    }
+    
+    public void drawString(String str, float x, float y) {
+        drawString(str,x,y,1,1,0);
+    }
+    
+    public void drawString(String str, float x, float y, float sw, float sh) {
+        drawString(str,x,y,sw,sh,0);
+    }
+    
+    public void drawString(String str, float x, float y, float sw, float sh, float rot) {
+        x /= 2;
+        y /= 2;
+        float w = Font.getSpaceWidth();
+        float h = Font.getLineHeight();
+        double xtrav = w*Math.cos( Math.toRadians(rot) )*sw;
+        double ytrav = w*Math.sin( Math.toRadians(rot) )*sh;
+        double xjmp = h*Math.sin( Math.toRadians(rot+180) )*sw;
+        double yjmp = h*Math.cos( Math.toRadians(rot+180) )*sh;
+        
+        double xcur = x;
+        double ycur = y;
+        int linesdown = 0;
+        for (int i=0; i<str.length(); ++i) {
+            char c = str.charAt(i);
+            switch (c) {
+                case '\n':
+                    ++linesdown;
+                    xcur = x-xjmp*linesdown;
+                    ycur = y+yjmp*linesdown;
+                    break;
+                case '\t':
+                    xcur += xtrav*TabLength;
+                    ycur += ytrav*TabLength;
+                    break;
+                default:
+                    TextureRegion reg = Letters.get(c);
+                    double xoff = Font.getData().getGlyph(c).xoffset/w;
+                    double yoff = Font.getData().getGlyph(c).yoffset/h;
+                    if (reg != null) drawRegion(reg, x + (float)(xcur + xoff*xtrav + yoff*xjmp)
+                            , y + (float)(ycur + xoff*ytrav - yoff*yjmp)
+                            , sw*-1, sh, rot, 0, 0);
+                    xcur += xtrav;
+                    ycur += ytrav;
+            }
         }
     }
     
     public void dispose() {
+        Font.dispose();
         for (TexGrid t : Image.values())
             t.dispose();
     }
