@@ -38,8 +38,10 @@ public class MultiSpriteRegister {
     }
     
     public void Generate() {
-        for (Sprite s : Frame.values())
+        for (Sprite s : Frame.values()) {
             s.Generate(Image);
+            newAnim("_" + s.Name, new String[] { s.Name },0,null); //auto generate single frame animation for each frame
+        }
         for (AnimSeq a : Anim.values())
             a.Generate(Frame);
     }
@@ -59,9 +61,11 @@ public class MultiSpriteRegister {
     public void draw(String anim, float statetime, float x, float y, float sw, float sh, float rot, float cx, float cy) {
         try {
             TextureRegion reg = Anim.get(anim).getKeyFrame(statetime);
-            MyBatch.draw(reg, x, y, reg.getRegionWidth()*cx, reg.getRegionHeight()*cy, reg.getRegionWidth(), reg.getRegionHeight(), sw, sh, rot, false);
+            //For some reson was drawing with width and height swapped and rotated 90 degrees when done normally
+            MyBatch.draw(reg, x, y, reg.getRegionHeight()*cx, reg.getRegionWidth()*cy, reg.getRegionHeight(), reg.getRegionWidth(), sw, sh, rot-90, false);
         } catch (Exception e) {
             //nothing
+            System.err.println("Error drawing: " + e.toString()); //debug
         }
     }
     
