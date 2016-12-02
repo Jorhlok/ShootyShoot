@@ -1,4 +1,4 @@
 # ShootyShoot
-Small game
+Small game, possibly.
 
 jorhlok.net
