@@ -116,6 +116,7 @@ public class ShootyShoot extends ApplicationAdapter {
         msr.newSprite("darkyellowbar", "sprites", 5, 4, 1, 1, false, false);
         msr.newSprite("uiback", "sprites", 6, 4, 1, 1, false, false);
         msr.newSprite("uislot", "sprites", 7, 4, 1, 1, false, false);
+        msr.newSprite("cursor", "sprites", 8, 4, 1, 1, false, false);
 
         msr.newSprite("greenblock", "sprites", 0, 15, 1, 1, false, false);
         msr.newSprite("skyblueblock", "sprites", 1, 15, 1, 1, false, false);
