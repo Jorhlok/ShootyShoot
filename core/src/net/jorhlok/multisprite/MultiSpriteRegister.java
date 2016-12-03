@@ -24,6 +24,7 @@ public class MultiSpriteRegister {
     public BitmapFont Font; //assumes monospace font
     public String DrawableChars;
     public float TabLength = 4;
+    public float FontSampling = 1;
     
     public MultiSpriteRegister() {
         Image = new HashMap<String,TexGrid>();
@@ -110,12 +111,12 @@ public class MultiSpriteRegister {
         y /= 2;
         float w = Font.getSpaceWidth();
         float h = Font.getLineHeight();
-        x += h*Scale.y*sh*0.5f*Math.sin( Math.toRadians(-1*rot) );
-        y += h*Scale.y*sh*0.5f*Math.cos( Math.toRadians(-1*rot) );
-        double xtrav = w*Math.cos( Math.toRadians(rot) )*sw*Scale.x;
-        double ytrav = w*Math.sin( Math.toRadians(rot) )*sw*Scale.y;
-        double xjmp = h*Math.sin( Math.toRadians(rot+180) )*sh*Scale.x;
-        double yjmp = h*Math.cos( Math.toRadians(rot+180) )*sh*Scale.y;
+        x += h*Scale.y*sh*0.5f*Math.sin( Math.toRadians(-1*rot) )/FontSampling;
+        y += h*Scale.y*sh*0.5f*Math.cos( Math.toRadians(-1*rot) )/FontSampling;
+        double xtrav = w*Math.cos( Math.toRadians(rot) )*sw*Scale.x/FontSampling;
+        double ytrav = w*Math.sin( Math.toRadians(rot) )*sw*Scale.y/FontSampling;
+        double xjmp = h*Math.sin( Math.toRadians(rot+180) )*sh*Scale.x/FontSampling;
+        double yjmp = h*Math.cos( Math.toRadians(rot+180) )*sh*Scale.y/FontSampling;
         
         double xcur = x;
         double ycur = y;
@@ -138,7 +139,7 @@ public class MultiSpriteRegister {
                     double yoff = Font.getData().getGlyph(c).yoffset/h;
                     if (reg != null) drawRegion(reg, x + (float)(xcur + xoff*xtrav + yoff*xjmp)
                             , y + (float)(ycur + xoff*ytrav - yoff*yjmp)
-                            , sw, sh*-1, rot);
+                            , sw/FontSampling, sh*-1/FontSampling, rot);
                     xcur += xtrav;
                     ycur += ytrav;
             }
