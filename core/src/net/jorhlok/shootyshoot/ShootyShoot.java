@@ -3,11 +3,14 @@ package net.jorhlok.shootyshoot;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.Hinting;
+import com.badlogic.gdx.math.Vector2;
 import net.jorhlok.multisprite.MultiSpriteRegister;
 
 
@@ -16,6 +19,9 @@ public class ShootyShoot extends ApplicationAdapter {
     SpriteBatch batch;
     BitmapFont font;
     MultiSpriteRegister msr;
+    private final OrthographicCamera camera = new OrthographicCamera();
+    private final Vector2 campos = new Vector2();
+    
     float time = 0;
 
     @Override
@@ -25,21 +31,33 @@ public class ShootyShoot extends ApplicationAdapter {
         msr.Generate();
         batch = new SpriteBatch();
         msr.MyBatch = batch;
+        camera.setToOrtho(false, 640/16, 360/16);
+        camera.position.x = campos.x = 640/32;
+        camera.position.y = campos.y = 360/32;
+        msr.Scale = new Vector2(1f/16,1f/16);
+        msr.CamPos = campos;
     }
 
     @Override
     public void render () {
-            Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            batch.begin();
-            msr.drawString("Monster Part\n\tUsed in crafting."
-                    , 500/*+(float)(Math.sin(time)*-10.5f*4)*/
-                    , 450+(float)Math.sin(time)*-10.5f*8
-                    , 2, 2, (float)Math.sin(time)*30);
-            System.out.println(Math.sin(time));
-            msr.draw("_eyeball", time, 640-16, 360-16, 2, 2, time*-90);
-            time += Gdx.graphics.getDeltaTime();
-            batch.end();
+        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        msr.draw("_greenblock", time, 320/16, 180/16, 640/16, 1, time*30);
+        msr.drawString("||Hello, World||\n||\t||", 320/16, 180/16, 2, 1, time*30);
+        msr.draw("_greyblock", 0, 1, 1, 1, 1);
+        msr.draw("_alchemy", 0, 2, 2, 2, 2);
+        msr.draw("pacrt", time, 6, 2, 1, 1);
+        time += Gdx.graphics.getDeltaTime();
+        batch.end();
+    }
+    
+    @Override
+    public void resize(int width, int height) {
+        
     }
 
     @Override
@@ -56,6 +74,7 @@ public class ShootyShoot extends ApplicationAdapter {
         parameter.magFilter = Texture.TextureFilter.Nearest;
         parameter.minFilter = Texture.TextureFilter.Nearest;
         //parameter.characters = parameter.characters + ",▄■";
+        parameter.hinting = Hinting.Full;
         msr.Font = font = generator.generateFont(parameter);
         msr.DrawableChars = parameter.characters;
         generator.dispose();

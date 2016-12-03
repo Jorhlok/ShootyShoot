@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,8 @@ public class MultiSpriteRegister {
     public Map<String,AnimSeq> Anim;
     public Map<Character,TextureRegion> Letters;
     
+    public Vector2 Scale;
+    public Vector2 CamPos;
     public Batch MyBatch;
     public BitmapFont Font; //assumes monospace font
     public String DrawableChars;
@@ -61,10 +64,14 @@ public class MultiSpriteRegister {
         }
     }
     
-    public void drawRegion(TextureRegion reg, float x, float y, float sw, float sh, float rot, float cx, float cy) {
+    public void drawRegion(TextureRegion reg, float x, float y, float sw, float sh, float rot) {
         //For some reson was drawing with width and height swapped and rotated 90 degrees when done normally
         try {
-        MyBatch.draw(reg, x, y, reg.getRegionHeight()*cx, reg.getRegionWidth()*cy, reg.getRegionHeight(), reg.getRegionWidth(), sw, sh, rot-90, false);
+            MyBatch.draw(reg, x, y
+                    , 0, 0
+                    , reg.getRegionHeight()*Scale.y*sh, reg.getRegionWidth()*Scale.x*sw
+                    , 1, 1
+                    , rot-90, false);
         } catch (Exception e) {
             //nothing
 //            System.err.println("Error drawing: " + e.toString()); //debug
@@ -72,21 +79,22 @@ public class MultiSpriteRegister {
     }
     
     public void draw(String anim, float statetime, float x, float y) {
-        draw(anim,statetime,x,y,1,1,0,0.5f,0.5f);
+        draw(anim,statetime,x,y,1,1,0);
     }
     
     public void draw(String anim, float statetime, float x, float y, float sw, float sh) {
-        draw(anim,statetime,x,y,sw,sh,0,0.5f,0.5f);
+        draw(anim,statetime,x,y,sw,sh,0);
     }
     
     public void draw(String anim, float statetime, float x, float y, float sw, float sh, float rot) {
-        draw(anim,statetime,x,y,sw,sh,rot,0.5f,0.5f);
-    } 
-    
-    public void draw(String anim, float statetime, float x, float y, float sw, float sh, float rot, float cx, float cy) {
+        try {
             TextureRegion reg = Anim.get(anim).getKeyFrame(statetime);
-            drawRegion(reg,x,y,sw,sh,rot,cx,cy);
-
+            x += reg.getRegionHeight()*Scale.y*sh*Math.sin( Math.toRadians(-1*rot) );
+            y += reg.getRegionHeight()*Scale.y*sh*Math.cos( Math.toRadians(-1*rot) );
+            drawRegion(reg,x,y,sw,sh,rot);
+        } catch (Exception e) {
+            //nothing
+        }
     }
     
     public void drawString(String str, float x, float y) {
@@ -102,10 +110,12 @@ public class MultiSpriteRegister {
         y /= 2;
         float w = Font.getSpaceWidth();
         float h = Font.getLineHeight();
-        double xtrav = w*Math.cos( Math.toRadians(rot) )*sw;
-        double ytrav = w*Math.sin( Math.toRadians(rot) )*sh;
-        double xjmp = h*Math.sin( Math.toRadians(rot+180) )*sw;
-        double yjmp = h*Math.cos( Math.toRadians(rot+180) )*sh;
+        x += h*Scale.y*sh*0.5f*Math.sin( Math.toRadians(-1*rot) );
+        y += h*Scale.y*sh*0.5f*Math.cos( Math.toRadians(-1*rot) );
+        double xtrav = w*Math.cos( Math.toRadians(rot) )*sw*Scale.x;
+        double ytrav = w*Math.sin( Math.toRadians(rot) )*sw*Scale.y;
+        double xjmp = h*Math.sin( Math.toRadians(rot+180) )*sh*Scale.x;
+        double yjmp = h*Math.cos( Math.toRadians(rot+180) )*sh*Scale.y;
         
         double xcur = x;
         double ycur = y;
@@ -128,7 +138,7 @@ public class MultiSpriteRegister {
                     double yoff = Font.getData().getGlyph(c).yoffset/h;
                     if (reg != null) drawRegion(reg, x + (float)(xcur + xoff*xtrav + yoff*xjmp)
                             , y + (float)(ycur + xoff*ytrav - yoff*yjmp)
-                            , sw*-1, sh, rot, 0, 0);
+                            , sw, sh*-1, rot);
                     xcur += xtrav;
                     ycur += ytrav;
             }
