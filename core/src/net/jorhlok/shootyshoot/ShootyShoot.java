@@ -70,9 +70,9 @@ public class ShootyShoot extends ApplicationAdapter {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("gfx/libmono.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 14*6;
-//        parameter.genMipMaps = true;
+        parameter.genMipMaps = true;
         parameter.magFilter = Texture.TextureFilter.Nearest;
-        parameter.minFilter = Texture.TextureFilter.Nearest;
+        parameter.minFilter = Texture.TextureFilter.Linear;
         //parameter.characters = parameter.characters + ",▄■";
         parameter.hinting = Hinting.Full;
         msr.Font = font = generator.generateFont(parameter);

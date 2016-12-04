@@ -115,8 +115,8 @@ public class MultiSpriteRegister {
         y += h*Scale.y*sh*0.5f*Math.cos( Math.toRadians(-1*rot) )/FontSampling;
         double xtrav = w*Math.cos( Math.toRadians(rot) )*sw*Scale.x/FontSampling;
         double ytrav = w*Math.sin( Math.toRadians(rot) )*sw*Scale.y/FontSampling;
-        double xjmp = h*Math.sin( Math.toRadians(rot+180) )*sh*Scale.x/FontSampling;
-        double yjmp = h*Math.cos( Math.toRadians(rot+180) )*sh*Scale.y/FontSampling;
+        double xjmp = h*Math.sin( Math.toRadians(rot) )*sh*Scale.x/FontSampling;
+        double yjmp = h*Math.cos( Math.toRadians(rot) )*sh*Scale.y/FontSampling;
         
         double xcur = x;
         double ycur = y;
@@ -126,8 +126,8 @@ public class MultiSpriteRegister {
             switch (c) {
                 case '\n':
                     ++linesdown;
-                    xcur = x-xjmp*linesdown;
-                    ycur = y+yjmp*linesdown;
+                    xcur = x+xjmp*linesdown;
+                    ycur = y-yjmp*linesdown;
                     break;
                 case '\t':
                     xcur += xtrav*TabLength;
@@ -137,8 +137,8 @@ public class MultiSpriteRegister {
                     TextureRegion reg = Letters.get(c);
                     double xoff = Font.getData().getGlyph(c).xoffset/w;
                     double yoff = Font.getData().getGlyph(c).yoffset/h;
-                    if (reg != null) drawRegion(reg, x + (float)(xcur + xoff*xtrav + yoff*xjmp)
-                            , y + (float)(ycur + xoff*ytrav - yoff*yjmp)
+                    if (reg != null) drawRegion(reg, x + (float)(xcur + xoff*xtrav - yoff*xjmp)
+                            , y + (float)(ycur + xoff*ytrav + yoff*yjmp)
                             , sw/FontSampling, sh*-1/FontSampling, rot);
                     xcur += xtrav;
                     ycur += ytrav;
