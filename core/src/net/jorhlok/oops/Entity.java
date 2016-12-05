@@ -1,5 +1,6 @@
 package net.jorhlok.oops;
 
+import java.util.LinkedList;
 import java.util.Queue;
 import net.jorhlok.multisprite.MultiSpriteRegister;
 
@@ -7,20 +8,21 @@ import net.jorhlok.multisprite.MultiSpriteRegister;
  * Some sort of entity. May or may not exist in worldspace.
  * @author Jorhlok
  */
-abstract public class Entity {
-    public String Name;
-    public String Type;
-    public Queue<Integer> Events;
+public class Entity {
+    public String Name = "";
+    public String Type = "";
+    public Queue<Postage> Mailbox = new LinkedList<Postage>();
     
     public void update(float deltatime) {
-        //semiauto do something about events
         prestep(deltatime);
         step(deltatime);
         poststep(deltatime);
+        Mailbox.clear();
     }
     
-    abstract public void prestep(float deltatime);
-    abstract public void step(float deltatime);
-    abstract public void poststep(float deltatime);
-    abstract public void draw(MultiSpriteRegister msr);
+    public void create() {}
+    public void prestep(float deltatime) {}
+    public void step(float deltatime) {}
+    public void poststep(float deltatime) {}
+    public void draw(MultiSpriteRegister msr) {}
 }

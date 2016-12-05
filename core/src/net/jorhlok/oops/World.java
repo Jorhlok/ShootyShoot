@@ -1,7 +1,7 @@
 package net.jorhlok.oops;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.utils.Array;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,7 +16,7 @@ public class World {
     public TiledMap Level;
     
     //runtime
-    public Map<String,Array<Entity> > Living;
+    public Map<String,List<Entity> > Living;
     
     /**
      * Polymorphism to the max!
