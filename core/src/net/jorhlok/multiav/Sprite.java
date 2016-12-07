@@ -1,4 +1,4 @@
-package net.jorhlok.multisprite;
+package net.jorhlok.multiav;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.Map;

@@ -3,7 +3,7 @@ package net.jorhlok.oops;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import java.util.List;
 import java.util.Map;
-import net.jorhlok.multisprite.MultiSpriteRegister;
+import net.jorhlok.multiav.MultiAVRegister;
 
 /**
  * The master script in a room.
@@ -46,7 +46,7 @@ public class DungeonMaster {
         
     }
     
-    public void draw(float deltatime, MultiSpriteRegister msr) {
+    public void draw(float deltatime, MultiAVRegister msr) {
         
     }
 }

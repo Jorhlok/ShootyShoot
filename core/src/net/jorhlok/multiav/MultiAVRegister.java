@@ -1,4 +1,4 @@
-package net.jorhlok.multisprite;
+package net.jorhlok.multiav;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -9,14 +9,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Multi-Function Sprite Organization Engine
+ * Multi-Function Audio-Visual Organization Engine
  * @author Jorhlok
  */
-public class MultiSpriteRegister {
+public class MultiAVRegister {
     public Map<String,TexGrid> Image;
     public Map<String,Sprite> Frame;
     public Map<String,AnimSeq> Anim;
     public Map<Character,TextureRegion> Letters;
+    public Map<String,SEffect> SFX;
     
     public Vector2 Scale;
     public Vector2 CamPos;
@@ -26,11 +27,12 @@ public class MultiSpriteRegister {
     public float TabLength = 4;
     public float FontSampling = 1;
     
-    public MultiSpriteRegister() {
+    public MultiAVRegister() {
         Image = new HashMap<String,TexGrid>();
         Frame = new HashMap<String,Sprite>();
         Anim = new HashMap<String,AnimSeq>();
         Letters = new HashMap<Character,TextureRegion>();
+        SFX = new HashMap<String,SEffect>();
     }
     
     public void newImage(String key, String uri, int tw, int th) {
@@ -45,6 +47,12 @@ public class MultiSpriteRegister {
     
     public void newAnim(String key, String[] frames, float speed, Animation.PlayMode mode) {
         Anim.put(key, new AnimSeq(key,frames,speed,mode));
+    }
+    
+    public void newSFX(String key, String uri) {
+        SEffect s = SFX.get(key);
+        if (s != null) s.dispose();
+        SFX.put(key, new SEffect(key,uri));
     }
     
     public void Generate() {
@@ -146,9 +154,28 @@ public class MultiSpriteRegister {
         }
     }
     
+    public SEffect getSFX(String key) {
+        return SFX.get(key);
+    }
+    
+    public void playSFX(String key) {
+        try {
+            SFX.get(key).play();
+        } catch (Exception e) {
+            //nothing
+        }
+    }
+    
+    public void setSFXVolume(float v) {
+        for (SEffect s : SFX.values())
+            s.setVolume(v);
+    }
+    
     public void dispose() {
         Font.dispose();
         for (TexGrid t : Image.values())
             t.dispose();
+        for (SEffect s : SFX.values())
+            s.dispose();
     }
 }

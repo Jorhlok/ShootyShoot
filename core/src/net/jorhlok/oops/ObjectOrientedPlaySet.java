@@ -2,7 +2,7 @@ package net.jorhlok.oops;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import java.util.Map;
-import net.jorhlok.multisprite.MultiSpriteRegister;
+import net.jorhlok.multiav.MultiAVRegister;
 
 /**
  * Object Oriented Gameplay Setup
@@ -17,7 +17,7 @@ public class ObjectOrientedPlaySet {
     public Map<String,DungeonMaster> MasterScript;
     
     //runtime
-    public MultiSpriteRegister MSR;
+    public MultiAVRegister MAV;
     public DungeonMaster Here;
         //something about input here
     
