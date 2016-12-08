@@ -31,12 +31,12 @@ public class ShootyShoot extends ApplicationAdapter {
         mkav();
         mav.Generate();
         batch = new SpriteBatch();
-        mav.MyBatch = batch;
+        mav.setBatch(batch);
         camera.setToOrtho(false, 640/16, 360/16);
         camera.position.x = campos.x = 640/32;
         camera.position.y = campos.y = 360/32;
-        mav.Scale = new Vector2(1f/16,1f/16);
-        mav.CamPos = campos;
+        mav.setScale( new Vector2(1f/16,1f/16) );
+        mav.setCamPos(campos);
     }
 
     @Override
@@ -58,8 +58,7 @@ public class ShootyShoot extends ApplicationAdapter {
         batch.end();
         
         if (sfxtime >= 1) {
-//            mav.SFX.get("pew").stop();
-            mav.SFX.get("dash").play();
+            mav.playSFX("dash");
             sfxtime = 0;
         }
         else sfxtime += deltatime;
@@ -89,9 +88,8 @@ public class ShootyShoot extends ApplicationAdapter {
         parameter.minFilter = Texture.TextureFilter.Linear;
         //parameter.characters = parameter.characters + ",▄■";
         parameter.hinting = Hinting.Full;
-        mav.Font = font = generator.generateFont(parameter);
-        mav.DrawableChars = parameter.characters;
-        mav.FontSampling = 6f;
+        mav.setFont(font = generator.generateFont(parameter), parameter.characters);
+        mav.setFontSampling(6f);
         generator.dispose();
 
         mav.newImage("sprites", "gfx/sprites.png", 16, 16);

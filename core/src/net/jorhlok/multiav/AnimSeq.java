@@ -11,15 +11,13 @@ import java.util.Map;
  */
 public class AnimSeq {
     //input
-    public String Name;
-    public String[] FrameNames;
-    public float FrameTime;
-    public Animation.PlayMode PlayMode;
+    protected String Name;
+    protected String[] FrameNames;
+    protected float FrameTime;
+    protected Animation.PlayMode PlayMode;
     
     //generated
-    public Sprite[] Sprites;
-    public Array<TextureRegion> Frames;
-    public Animation Anim;
+    protected Animation Anim;
     
     public AnimSeq(String key, String[] frames, float speed, Animation.PlayMode mode) {
         Name = key;
@@ -28,17 +26,19 @@ public class AnimSeq {
         PlayMode = mode;
     }
     
-    public void Generate(Map<String,Sprite> map) {
+    public String getName() {
+        return Name;
+    }
+    
+    public void Generate(Map<String,SprFrame> map) {
         if (map == null) {
-            Sprites = null;
             Anim = null;
             return;
         }
-        Sprites = new Sprite[FrameNames.length];
-        Frames = new Array();
+        Array<TextureRegion> Frames = new Array();
         for (int i=0; i<FrameNames.length; ++i) {
-            Sprites[i] = map.get(FrameNames[i]);
-            Frames.add( (Sprites[i]==null)?null:Sprites[i].Data );
+            SprFrame spr = map.get(FrameNames[i]);
+            Frames.add( (spr==null)?null:spr.getReg() );
         }
         Anim = new Animation(FrameTime,Frames,PlayMode);
     }
@@ -46,5 +46,9 @@ public class AnimSeq {
     public TextureRegion getKeyFrame(float StateTime) {
         if (Anim == null) return null;
         return Anim.getKeyFrame(StateTime);
+    }
+    
+    public void dispose() {
+        Anim = null;
     }
 }

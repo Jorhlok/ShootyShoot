@@ -13,23 +13,24 @@ import java.util.Map;
  * @author Jorhlok
  */
 public class MultiAVRegister {
-    public Map<String,TexGrid> Image;
-    public Map<String,Sprite> Frame;
-    public Map<String,AnimSeq> Anim;
-    public Map<Character,TextureRegion> Letters;
-    public Map<String,SEffect> SFX;
+    protected Map<String,TexGrid> Image;
+    protected Map<String,SprFrame> Frame;
+    protected Map<String,AnimSeq> Anim;
+    protected Map<Character,TextureRegion> Letters;
+    protected Map<String,SEffect> SFX;
+    protected Map<String,MTrack> Mus;
+    protected BitmapFont Font; //assumes monospace font
+    protected String DrawableChars;
     
-    public Vector2 Scale;
-    public Vector2 CamPos;
-    public Batch MyBatch;
-    public BitmapFont Font; //assumes monospace font
-    public String DrawableChars;
-    public float TabLength = 4;
-    public float FontSampling = 1;
+    protected Batch MyBatch;
+    protected Vector2 Scale;
+    protected Vector2 CamPos;
+    protected float TabLength = 4;
+    protected float FontSampling = 1;
     
     public MultiAVRegister() {
         Image = new HashMap<String,TexGrid>();
-        Frame = new HashMap<String,Sprite>();
+        Frame = new HashMap<String,SprFrame>();
         Anim = new HashMap<String,AnimSeq>();
         Letters = new HashMap<Character,TextureRegion>();
         SFX = new HashMap<String,SEffect>();
@@ -42,11 +43,17 @@ public class MultiAVRegister {
     }
     
     public void newSprite(String key, String img, int tx, int ty, int tw, int th, boolean hf, boolean vf) {
-        Frame.put(key, new Sprite(key,img,tx,ty,tw,th,hf,vf));
+        Frame.put(key, new SprFrame(key,img,tx,ty,tw,th,hf,vf));
     }
     
     public void newAnim(String key, String[] frames, float speed, Animation.PlayMode mode) {
         Anim.put(key, new AnimSeq(key,frames,speed,mode));
+    }
+    
+    public void setFont(BitmapFont f, String chars) {
+        if (Font != null) Font.dispose();
+        Font = f;
+        DrawableChars = chars;
     }
     
     public void newSFX(String key, String uri) {
@@ -55,8 +62,62 @@ public class MultiAVRegister {
         SFX.put(key, new SEffect(key,uri));
     }
     
+    public void newMusic(String key, String uri) {
+        MTrack m = Mus.get(key);
+        if (m != null) m.dispose();
+        Mus.put(key, new MTrack(key,uri) );
+    }
+    
+    public void newMusic(String key, String intro, String body) {
+        MTrack m = Mus.get(key);
+        if (m != null) m.dispose();
+        Mus.put(key, new MTrack(key,intro,body) );
+    }
+
+    public Batch getBatch() {
+        return MyBatch;
+    }
+
+    public void setBatch(Batch MyBatch) {
+        this.MyBatch = MyBatch;
+    }
+
+    public Vector2 getScale() {
+        return Scale;
+    }
+
+    public void setScale(Vector2 Scale) {
+        this.Scale = Scale;
+    }
+
+    public Vector2 getCamPos() {
+        return CamPos;
+    }
+
+    public void setCamPos(Vector2 CamPos) {
+        this.CamPos = CamPos;
+    }
+
+    public float getTabLength() {
+        return TabLength;
+    }
+
+    public void setTabLength(float TabLength) {
+        this.TabLength = TabLength;
+    }
+
+    public float getFontSampling() {
+        return FontSampling;
+    }
+
+    public void setFontSampling(float FontSampling) {
+        this.FontSampling = FontSampling;
+    }
+    
     public void Generate() {
-        for (Sprite s : Frame.values()) {
+        for (TexGrid t : Image.values())
+            t.Generate();
+        for (SprFrame s : Frame.values()) {
             s.Generate(Image);
             newAnim("_" + s.Name, new String[] { s.Name },0,null); //auto generate single frame animation for each frame
         }
@@ -71,6 +132,8 @@ public class MultiAVRegister {
                 }
             }
         }
+        for (SEffect s : SFX.values())
+            s.Generate();
     }
     
     public void drawRegion(TextureRegion reg, float x, float y, float sw, float sh, float rot) {
@@ -171,11 +234,29 @@ public class MultiAVRegister {
             s.setVolume(v);
     }
     
+    public void setMusVolume(float v) {
+        for (MTrack m : Mus.values())
+            m.setVolume(v);
+    }
+    
+    public void killMusic() {
+        for (MTrack m : Mus.values()) {
+            m.stop();
+            m.dispose();
+        }
+    }
+    
     public void dispose() {
         Font.dispose();
         for (TexGrid t : Image.values())
             t.dispose();
+        for (SprFrame s : Frame.values())
+            s.dispose();
+        for (AnimSeq a : Anim.values())
+            a.dispose();
         for (SEffect s : SFX.values())
             s.dispose();
+        for (MTrack m : Mus.values())
+            m.dispose();
     }
 }

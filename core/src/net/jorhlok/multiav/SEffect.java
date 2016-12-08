@@ -2,20 +2,28 @@ package net.jorhlok.multiav;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.files.FileHandle;
 
 /**
  *
  * @author joshm
  */
 public class SEffect {
+    //setup
     protected String Name;
-    protected Sound Data;
+    protected String URI;
     protected float GlobalVolume = 1;
+    
+    //runtime
+    protected Sound Data;
     
     public SEffect(String key, String uri) {
         Name = key;
-        Data = Gdx.audio.newSound(new FileHandle(uri));
+//        Data = Gdx.audio.newSound(new FileHandle(uri));
+        URI = uri;
+    }
+    
+    public void Generate() {
+        Data = Gdx.audio.newSound(Gdx.files.internal(URI));
     }
     
     public String getName() {
@@ -54,20 +62,36 @@ public class SEffect {
     }
 
     public long play(float volume, float speed, float pan, boolean loop) {
-        long id = Data.play(volume*GlobalVolume, speed, pan);
-        Data.setLooping(id, loop);
-        return id;
+        try {
+            long id = Data.play(volume*GlobalVolume, speed, pan);
+            Data.setLooping(id, loop);
+            return id;
+        } catch (Exception e) {
+            return -1;
+        }
     }
     
     public void stop() {
-        Data.stop();
+        try {
+            Data.stop();
+        } catch (Exception e) {
+            //nothing
+        }
     }
     
     public void stop(long id) {
-        Data.stop(id);
+        try {
+            Data.stop(id);
+        } catch (Exception e) {
+            //nothing
+        }
     }
     
     public void dispose() {
-        Data.dispose();
+        try {
+            Data.dispose();
+        } catch (Exception e) {
+            //nothing
+        }
     }
 }
