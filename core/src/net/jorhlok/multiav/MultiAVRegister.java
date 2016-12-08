@@ -34,6 +34,7 @@ public class MultiAVRegister {
         Anim = new HashMap<String,AnimSeq>();
         Letters = new HashMap<Character,TextureRegion>();
         SFX = new HashMap<String,SEffect>();
+        Mus = new HashMap<String,MTrack>();
     }
     
     public void newImage(String key, String uri, int tw, int th) {
@@ -219,6 +220,10 @@ public class MultiAVRegister {
     
     public SEffect getSFX(String key) {
         return SFX.get(key);
+    }
+    
+    public MTrack getMus(String key) {
+        return Mus.get(key);
     }
     
     public void playSFX(String key) {

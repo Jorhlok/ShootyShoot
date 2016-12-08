@@ -30,7 +30,11 @@ public class TexGrid {
     }
     
     public void Generate() {
-        
+        try {
+            Tex = new Texture(URI);
+        } catch (Exception e) {
+            System.err.println("Error loading image " + Name + " because:\n" + e.toString());
+        }
     }
     
     public TextureRegion GetRegion(int tx, int ty) {

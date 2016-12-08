@@ -1,5 +1,6 @@
 package net.jorhlok.multiav;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 
 /**
@@ -10,7 +11,7 @@ public class MTrack implements Music.OnCompletionListener {
     //setup
     protected String Name;
     protected String URIIntro;
-    protected String URILoop;
+    protected String URIBody;
     
     //runtime
     protected Music DataIntro;
@@ -21,13 +22,13 @@ public class MTrack implements Music.OnCompletionListener {
     public MTrack(String key, String uri) {
         Name = key;
         URIIntro = null;
-        URILoop = uri;
+        URIBody = uri;
     }
         
     public MTrack(String key, String intro, String body) {
         Name = key;
         URIIntro = intro;
-        URILoop = body;
+        URIBody = body;
     }
     
     public String getName() {
@@ -39,7 +40,17 @@ public class MTrack implements Music.OnCompletionListener {
     }
     
     public void Generate() {
-        
+        dispose();
+        try {
+            DataIntro = Gdx.audio.newMusic(Gdx.files.internal(URIIntro));
+        } catch (Exception e) {
+            DataIntro = null;
+        }
+        try {
+            DataBody = Gdx.audio.newMusic(Gdx.files.internal(URIBody));
+        } catch (Exception e) {
+            DataBody = null;
+        }
     }
     
     public void dispose() {
@@ -65,7 +76,9 @@ public class MTrack implements Music.OnCompletionListener {
             DataIntro.setLooping(false);
             DataIntro.setOnCompletionListener(this);
             DataIntro.setVolume(GlobalVolume);
-            State = 1;
+            if (loop) State = 3;
+            else State = 1;
+            if (DataBody != null) DataBody.setLooping(loop);
             DataIntro.play();
         } catch (Exception e) {
             playNoIntro(loop);
@@ -103,31 +116,24 @@ public class MTrack implements Music.OnCompletionListener {
 
     @Override
     public void onCompletion(Music m) {
-        switch (State) {
-            case 1: //single playthrough done with intro
-                m.stop();
-                if (DataBody != null) {
-                    DataBody.setLooping(false);
+        try {
+            switch (State) {
+                case 1: //single playthrough done with intro
                     DataBody.play();
                     State = 2;
-                }
-                else State = 0;
-                break;
-            case 2: //single playthrough done with loop
-                m.stop();
-                State = 0;
-                break;
-            case 3: //looping done with intro
-                m.stop();
-                if (DataBody != null) {
-                    DataBody.setLooping(true);
+                    break;
+                case 2: //single playthrough done with loop
+                    State = 0;
+                    break;
+                case 3: //looping done with intro
                     DataBody.play();
                     State = 4;
-                }
-                else State = 0;
-                break;
-            default:
-                //nothing?
+                    break;
+                default:
+                    //nothing?
+            }
+        } catch (Exception e) {
+            //nothing
         }
     }
 }

@@ -2,6 +2,7 @@ package net.jorhlok.shootyshoot;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -24,6 +25,8 @@ public class ShootyShoot extends ApplicationAdapter {
     
     float time = 0;
     float sfxtime = 0f;
+    boolean musplay = false;
+    Music frcasio;
 
     @Override
     public void create () {
@@ -37,6 +40,7 @@ public class ShootyShoot extends ApplicationAdapter {
         camera.position.y = campos.y = 360/32;
         mav.setScale( new Vector2(1f/16,1f/16) );
         mav.setCamPos(campos);
+        
     }
 
     @Override
@@ -57,11 +61,18 @@ public class ShootyShoot extends ApplicationAdapter {
         time += deltatime;
         batch.end();
         
-        if (sfxtime >= 1) {
-            mav.playSFX("dash");
+        if (sfxtime >= 9) {
+            mav.setSFXVolume(0.33333f);
+            mav.playSFX("jump");
             sfxtime = 0;
         }
         else sfxtime += deltatime;
+        
+        if (!musplay) {
+            musplay = true;
+            mav.getMus("frcasio").Generate();
+            mav.getMus("frcasio").play(true);
+        }
     }
     
     @Override
@@ -75,6 +86,9 @@ public class ShootyShoot extends ApplicationAdapter {
     }
 
     public void mkav() {
+        mav.newMusic("frcasio", "bgm/FriendlyCasiotone.ogg");
+        mav.newMusic("mkds", "bgm/mkdsintro.ogg", "bgm/mkds.ogg");
+        
         mav.newSFX("pew", "sfx/pew.wav");
         mav.newSFX("jump", "sfx/jump.wav");
         mav.newSFX("dash", "sfx/dash.wav");

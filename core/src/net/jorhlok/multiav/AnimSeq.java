@@ -31,16 +31,17 @@ public class AnimSeq {
     }
     
     public void Generate(Map<String,SprFrame> map) {
-        if (map == null) {
+        try {
+            Array<TextureRegion> Frames = new Array();
+            for (int i=0; i<FrameNames.length; ++i) {
+                SprFrame spr = map.get(FrameNames[i]);
+                Frames.add( (spr==null)?null:spr.getReg() );
+            }
+            Anim = new Animation(FrameTime,Frames,PlayMode);
+        } catch (Exception e) {
             Anim = null;
-            return;
+            //nothing
         }
-        Array<TextureRegion> Frames = new Array();
-        for (int i=0; i<FrameNames.length; ++i) {
-            SprFrame spr = map.get(FrameNames[i]);
-            Frames.add( (spr==null)?null:spr.getReg() );
-        }
-        Anim = new Animation(FrameTime,Frames,PlayMode);
     }
     
     public TextureRegion getKeyFrame(float StateTime) {
