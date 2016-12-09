@@ -30,6 +30,7 @@ public class Corporeal extends Entity {
         if (Physics) doCorporealPhysics(deltatime);
         step(deltatime);
         //collect collisions
+        Maestro.CorporealCollisions(CollidesWith,CollideQueue,AABB);
         poststep(deltatime);
         //clear queues
         Mailbox.clear();

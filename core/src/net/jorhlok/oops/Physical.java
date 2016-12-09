@@ -1,8 +1,8 @@
 package net.jorhlok.oops;
 
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import java.util.LinkedList;
 import java.util.Queue;
 
 /**
@@ -16,7 +16,7 @@ public class Physical extends Corporeal {
     
     //runtime
     public byte CollisionFlags = 0; //0000UDLR
-    public Queue<MapObject> CollisionTiles;
+    public Queue<TMPCO> CollisionTiles = new LinkedList<TMPCO>();
     public Vector2 PrePosition = new Vector2(); //before simple physics
     public Vector2 PreVelocity = new Vector2();
     
@@ -30,12 +30,19 @@ public class Physical extends Corporeal {
             Rectangle aoi = new Rectangle(AABB).setPosition(AABB.x+Position.x, AABB.y+Position.y).merge( 
                     new Rectangle(AABB).setPosition(AABB.x+PrePosition.x, AABB.y+PrePosition.y) );
             //collect tiles from area of interest
-            
+            Maestro.PhysicalCollisions(CollisionTiles,aoi);
         }
         step(deltatime); //object specific tile checking
         if (Physics) {
             //do tile collisions
+            int len = CollisionTiles.size();
+            CollisionFlags = 0;
+            for (int i=0; i<len; ++i){
+                TMPCO t = CollisionTiles.poll();
+                
+            }
             //do entity collisions
+            Maestro.CorporealCollisions(CollidesWith,CollideQueue,AABB);
         }
         poststep(deltatime);
         //clear queues

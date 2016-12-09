@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-up" width="128" height="128" tilewidth="16" tileheight="16" backgroundcolor="#00ffff" nextobjectid="19">
+<map version="1.0" orientation="orthogonal" renderorder="right-up" width="128" height="128" tilewidth="16" tileheight="16" backgroundcolor="#00ffff" nextobjectid="19">
  <tileset firstgid="1" name="Sprites" tilewidth="16" tileheight="16" tilecount="256" columns="16">
   <image source="../gfx/sprites.png" width="256" height="256"/>
  </tileset>
+ <layer name="Background" width="128" height="128">
+  <data encoding="base64" compression="zlib">
+   eJzt2u2OgjAQBdB9/9f1BTYka2JcP1AKzPSek/hXp3MLlpafHwCAeV3+Pp3NMIajXe4+3dzX33UcR3nWr9u+dejhmnHw37u+delh59rPNGv+rPNJ/vo6H/nv692a6sz+fpq9/D9XucdV65rFN9kf2euKNc1E/rm2ZH9kz7+tZY/6Zppno/I/oid71Dr6O7vMiz3G3S3/jj0YoevYz861Qg9G6D7uR7+7to5Xdb8b26vfSMuenmTPYm22sgcAAGBWnnnz2AfLZj80l/3wbPLP5Twsm+xzyT2Taz6b/LPJl4Xcx9PPTO6lmayXclgz57JPmk3+yD+b7FnIm4XskT0AAEex7szm2SOTvadM9pxzOXPI5cwpl+xzdT5vrlZPRx2zr1pXRx362G1+Mk7n/ye22ZK9edDfqPzNgZ7kn0322eTOlbwBmI3/sBzWMbk8u2Tz/JrNHkY2+1jZ5J8rcR+7e/0jfZpv997NOJ95L+G+xnMp/23VndXjpPVNVWf1OnGNW81Z/d6SvfzHOLPv3bKfad5VuPY65F6xpq0qZL+2prNVnZdbVMz/vq4KKvRkb7OOa6tK1wXHqnhv5Diy5zZTmQMAAAAAAACM5cw1x6NzdufuGbxrk807V7m8c5dN/tnkz5W8WcgdAACATn4Bfi16Sw==
+  </data>
+ </layer>
  <layer name="Terrain" width="128" height="128">
   <data encoding="base64" compression="zlib">
    eJzt2kFuwzAMBVHf/7a5QfdeFIktkZ+aeYDWpTlAEDn9XNf18Xg86CMW+7PZn83+bPZnsz+b/dnsz2Z/Nvuz2Z/N/jP5/p/N/mfp2r/9c3R0sH+eyh72z1XRxP5s9mez/7m+6Wn/8/zS0/5n+bWj/c/xpKH92ezPZv9+nXu3f7/O/ds/R0cD++epbGH/TPZXBfuz2f88vv/nedrQ/rO97Wb/uVY0sz+b/dnsz2Z/Nvv3SNm3/fsk7N3+/Tp3b/8c/v4v+6uS/c/wtJ3951rRzv7zrOxl/zl2dLL/HDv62J/N/mz2Z7M/m/3Z7M9mfzb7s9mfzf610nZs/1pp+06bhyRh5/bv17l/++fw/z9V3cP+bPZnsz+b/c/wtKP9Z1rVzf5s9mezP5v92ezPZn82+2foamD/Wvd9d+8+YQb1sT+b/dnsP9Oq7w/2n2lVK/uz2Z/N/mz/vY/oPKrR3dn+vdL2njIHhf3Z7M9mfzb7s9mfzf5sv/bffa+3fy37s/n5n6mqi/0z2Z/N/mz2Z7M/m/1Vwf79OhvsfJfz5m+ohv37JDxr2t5T5qCw/37Jn29pc6XMQWF/NvuvNW3+tP6qZf93pu/um/5v3hF4z89m/zWmPtvEmbVOWv+UOVZJ2+9d0nwpc5Ck9E+Z442Jz5Aw89TvTncTn6F75tPvBek69064F6bbebf3eDwzzh/l3GN1
@@ -48,4 +53,9 @@
   <object id="17" name="Invisible Room" type="Boundary" x="860" y="100" width="129.333" height="22.6667"/>
   <object id="18" type="Boundary" x="984.667" y="94" width="25.3333" height="99.3333"/>
  </objectgroup>
+ <layer name="Foreground" width="128" height="128">
+  <data encoding="base64" compression="zlib">
+   eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGoADwAB
+  </data>
+ </layer>
 </map>

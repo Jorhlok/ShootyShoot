@@ -12,6 +12,7 @@ public class Entity {
     public String Name = "";
     public String Type = "";
     public Queue<Postage> Mailbox = new LinkedList<Postage>();
+    public DungeonMaster Maestro;
     
     public void update(float deltatime) {
         prestep(deltatime);
