@@ -37,9 +37,23 @@ public class Physical extends Corporeal {
             //do tile collisions
             int len = CollisionTiles.size();
             CollisionFlags = 0;
-            for (int i=0; i<len; ++i){
-                TMPCO t = CollisionTiles.poll();
-                
+            boolean vCheck = VerticalFirst;
+            Rectangle vRect = new Rectangle(AABB.x+Position.x + AABB.width*Tolerance.x/2, AABB.y+Position.y, 
+                    AABB.width - AABB.width*Tolerance.x/2, AABB.height);
+            Rectangle hRect = new Rectangle(AABB.x+Position.x, AABB.y+Position.y + AABB.height*Tolerance.y/2, 
+                    AABB.width, AABB.height - AABB.height*Tolerance.y/2);
+            for (int j=0; j<2; ++j) {
+                for (int i=0; i<len; ++i){
+                    TMPCO t = CollisionTiles.poll();
+                    if (vCheck) {
+                        
+                    }
+                    else {
+                        
+                    }
+                    CollisionTiles.add(t);
+                }
+                vCheck = !vCheck;
             }
             //do entity collisions
             Maestro.CorporealCollisions(CollidesWith,CollideQueue,AABB);
