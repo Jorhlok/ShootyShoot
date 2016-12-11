@@ -37,23 +37,43 @@ public class Physical extends Corporeal {
             //do tile collisions
             int len = CollisionTiles.size();
             CollisionFlags = 0;
-            boolean vCheck = VerticalFirst;
             Rectangle vRect = new Rectangle(AABB.x+Position.x + AABB.width*Tolerance.x/2, AABB.y+Position.y, 
                     AABB.width - AABB.width*Tolerance.x/2, AABB.height);
             Rectangle hRect = new Rectangle(AABB.x+Position.x, AABB.y+Position.y + AABB.height*Tolerance.y/2, 
                     AABB.width, AABB.height - AABB.height*Tolerance.y/2);
-            for (int j=0; j<2; ++j) {
-                for (int i=0; i<len; ++i){
-                    TMPCO t = CollisionTiles.poll();
-                    if (vCheck) {
-                        
-                    }
-                    else {
-                        
-                    }
+            //first pass
+            for (int i=0; i<len; ++i){
+                TMPCO t = CollisionTiles.poll();
+                if (t.AABB.overlaps(vRect)) {
+                    //check if it's a bottom hit or a top hit
+                    float tHi = t.AABB.y + t.AABB.height;
+                    float pHi = vRect.y + vRect.height;
+                    float up = pHi - tHi; 
+                    float down = vRect.y - t.AABB.y;
+                    if (up >= 0) t.CollisionFlags |= 8;
+                    if (down >= 0) t.CollisionFlags |= 4;
+                    if (!t.CollisionUp() && !t.CollisionDown()) t.CollisionFlags |= 8|4;
+                }
+                if (t.AABB.overlaps(hRect)) {
+                    //check if it's a left hit or a right hit
+                    float tRi = t.AABB.x + t.AABB.width;
+                    float pRi = hRect.x + hRect.width;
+                    float left = hRect.x - t.AABB.x;
+                    float right = pRi - tRi;
+                    if (left <= 0) t.CollisionFlags |= 2;
+                    if (right <= 0) t.CollisionFlags |= 1;
+                    if (!t.CollisionLeft() && !t.CollisionRight()) t.CollisionFlags |= 2|1;
+                }
+                CollisionTiles.add(t);
+            }
+            //second pass
+            for (int i=0; i<len; ++i) {
+                //this removes non-colliders and finds where things are pushing this
+                TMPCO t = CollisionTiles.poll();
+                if (t.CollisionFlags != 0) {
+                    //adjust position here
                     CollisionTiles.add(t);
                 }
-                vCheck = !vCheck;
             }
             //do entity collisions
             Maestro.CorporealCollisions(CollidesWith,CollideQueue,AABB);

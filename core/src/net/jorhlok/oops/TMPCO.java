@@ -12,6 +12,21 @@ public class TMPCO {
     Rectangle AABB = null;
     RectangleMapObject NonTile = null;
     TiledMapTile Tile = null;
-    boolean vHit = false;
-    boolean hHit = false;
+    byte CollisionFlags = 0; //0000UDLR
+    
+    public boolean CollisionUp() {
+        return (CollisionFlags&8) != 0;
+    }
+    
+    public boolean CollisionDown() {
+        return (CollisionFlags&4) != 0;
+    }
+    
+    public boolean CollisionLeft() {
+        return (CollisionFlags&2) != 0;
+    }
+    
+    public boolean CollisionRight() {
+        return (CollisionFlags&1) != 0;
+    }
 }
