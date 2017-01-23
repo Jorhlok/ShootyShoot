@@ -26,7 +26,6 @@ public class ShootyShoot extends ApplicationAdapter {
     float time = 0;
     float sfxtime = 0f;
     boolean musplay = false;
-    Music frcasio;
 
     @Override
     public void create () {
@@ -40,6 +39,7 @@ public class ShootyShoot extends ApplicationAdapter {
         camera.position.y = campos.y = 360/32;
         mav.setScale( new Vector2(1f/16,1f/16) );
         mav.setCamPos(campos);
+        mav.setMusVolume(0.5f);
         
     }
 

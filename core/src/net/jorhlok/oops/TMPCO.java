@@ -1,7 +1,7 @@
 package net.jorhlok.oops;
 
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 
 /**
@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Rectangle;
 public class TMPCO {
     Rectangle AABB = null;
     RectangleMapObject NonTile = null;
-    TiledMapTile Tile = null;
+    Cell cell = null;
     byte CollisionFlags = 0; //0000UDLR
     
     public boolean CollisionUp() {

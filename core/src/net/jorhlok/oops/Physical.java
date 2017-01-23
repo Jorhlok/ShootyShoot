@@ -22,15 +22,16 @@ public class Physical extends Corporeal {
     
     @Override
     public void update(float deltatime) {
-        prestep(deltatime);
+        prestep(deltatime); //anything beforehand
         if (Physics) {
             PrePosition.set(Position);
             PreVelocity.set(Velocity);
             doCorporealPhysics(deltatime);
-            Rectangle aoi = new Rectangle(AABB).setPosition(AABB.x+Position.x, AABB.y+Position.y).merge( 
+            Rectangle projected = new Rectangle(AABB).setPosition(AABB.x+Position.x, AABB.y+Position.y);
+            Rectangle aoi = projected.merge( 
                     new Rectangle(AABB).setPosition(AABB.x+PrePosition.x, AABB.y+PrePosition.y) );
             //collect tiles from area of interest
-            Maestro.PhysicalCollisions(CollisionTiles,aoi);
+            Maestro.PhysicalCollisions(CollisionTiles,aoi,projected);
         }
         step(deltatime); //object specific tile checking
         if (Physics) {
@@ -78,7 +79,7 @@ public class Physical extends Corporeal {
             //do entity collisions
             Maestro.CorporealCollisions(CollidesWith,CollideQueue,AABB);
         }
-        poststep(deltatime);
+        poststep(deltatime); //real interaction goes in here
         //clear queues
         Mailbox.clear();
         CollideQueue.clear();
