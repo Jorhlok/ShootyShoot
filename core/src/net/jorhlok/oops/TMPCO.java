@@ -9,10 +9,10 @@ import com.badlogic.gdx.math.Rectangle;
  * @author joshm
  */
 public class TMPCO {
-    Rectangle AABB = null;
-    RectangleMapObject NonTile = null;
-    Cell cell = null;
-    byte CollisionFlags = 0; //0000UDLR
+    public Rectangle AABB = null;
+    public RectangleMapObject NonTile = null;
+    public Cell cell = null;
+    public byte CollisionFlags = 0; //0000UDLR
     
     public boolean CollisionUp() {
         return (CollisionFlags&8) != 0;

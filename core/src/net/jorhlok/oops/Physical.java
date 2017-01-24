@@ -11,8 +11,8 @@ import java.util.Queue;
  */
 public class Physical extends Corporeal {
     //properties
-    public Vector2 Tolerance; //the extra space of each axis
-    public boolean VerticalFirst; //order each axis is checked
+    public Vector2 Tolerance = new Vector2(); //the extra space of each axis
+    public boolean VerticalFirst = true; //order each axis is checked
     
     //runtime
     public byte CollisionFlags = 0; //0000UDLR

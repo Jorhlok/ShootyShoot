@@ -2,7 +2,6 @@ package net.jorhlok.shootyshoot;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,8 +10,14 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.Hinting;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import net.jorhlok.multiav.MultiAVRegister;
+import net.jorhlok.oops.Entity;
 
 
 
@@ -26,6 +31,10 @@ public class ShootyShoot extends ApplicationAdapter {
     float time = 0;
     float sfxtime = 0f;
     boolean musplay = false;
+    
+    TestDM dm;
+    TestPlatformer plat;
+    TiledMap testmap;
 
     @Override
     public void create () {
@@ -41,6 +50,18 @@ public class ShootyShoot extends ApplicationAdapter {
         mav.setCamPos(campos);
         mav.setMusVolume(0.5f);
         
+        dm = new TestDM("map/test0.tmx",null);
+        Map<String,Class<? extends Entity> > etypes;
+        etypes = new HashMap<String,Class<? extends Entity> >();
+        etypes.put("TestPlatformer", TestPlatformer.class);
+        dm.create(null, etypes);
+        dm.Living.put("player", new LinkedList<Entity>());
+        dm.cam = camera;
+        dm.render = new OrthogonalTiledMapRenderer(dm.Level,1/16f,batch);
+        dm.render.setView(camera);
+        plat = new TestPlatformer();
+        dm.Living.get("player").add(plat);
+        plat.Maestro = dm;
     }
 
     @Override
@@ -49,24 +70,33 @@ public class ShootyShoot extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
         float deltatime = Gdx.graphics.getDeltaTime();
+        
+        //game logic
+        plat.update(deltatime);
 
         camera.update();
+        try {
+            dm.draw(deltatime, mav);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        mav.draw("_greenblock", time, 320/16, 180/16, 640/16, 1, time*30);
-        mav.drawString("||Hello, World||\n||\t||", 320/16, 180/16, 2, 1, time*30);
-        mav.draw("_greyblock", 0, 1, 1, 1, 1);
-        mav.draw("_alchemy", 0, 2, 2, 2, 2);
-        mav.draw("pacrt", time, 6, 2, 1, 1);
+        plat.draw(mav);
+//        mav.draw("_greenblock", time, 320/16, 180/16, 640/16, 1, time*30);
+//        mav.drawString("||Hello, World||\n||\t||", 320/16, 180/16, 2, 1, time*30);
+//        mav.draw("_greyblock", 0, 1, 1, 1, 1);
+//        mav.draw("_alchemy", 0, 2, 2, 2, 2);
+//        mav.draw("pacrt", time, 6, 2, 1, 1);
         time += deltatime;
         batch.end();
         
-        if (sfxtime >= 9) {
-            mav.setSFXVolume(0.33333f);
-            mav.playSFX("jump");
-            sfxtime = 0;
-        }
-        else sfxtime += deltatime;
+//        if (sfxtime >= 9) {
+//            mav.setSFXVolume(0.33333f);
+//            mav.playSFX("jump");
+//            sfxtime = 0;
+//        }
+//        else sfxtime += deltatime;
         
         if (!musplay) {
             musplay = true;

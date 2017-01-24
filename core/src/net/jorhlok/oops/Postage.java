@@ -12,5 +12,6 @@ public class Postage {
     public String Type;
     public int iValue;
     public float fValue;
+    public String sValue;
     public List<Object> Contents; //if the above doesn't suffice
 }

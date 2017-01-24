@@ -1,8 +1,7 @@
 package net.jorhlok.oops;
 
-import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -44,8 +43,9 @@ public class DungeonMaster {
     }
     
     public void create(Map<String,TiledMap> maps, Map<String, Class<? extends Entity> > etypes) {
+        eTypes = etypes;
         try {
-            Level = new TmxMapLoader(new ExternalFileHandleResolver()).load(MapName);
+            Level = new TmxMapLoader(new InternalFileHandleResolver()).load(MapName);
             try {
                 LyrTerrain = (TiledMapTileLayer) Level.getLayers().get(StrTerrain);
             } catch (Exception e) {
@@ -62,7 +62,7 @@ public class DungeonMaster {
                 //nothing
             }
         } catch (Exception e) {
-            //nothing
+            e.printStackTrace();//nothing
         }
     }
     
