@@ -45,35 +45,64 @@ public class Physical extends Corporeal {
             //first pass
             for (int i=0; i<len; ++i){
                 TMPCO t = CollisionTiles.poll();
+                t.CollisionFlags = 0;
                 if (t.AABB.overlaps(vRect)) {
                     //check if it's a bottom hit or a top hit
                     float tHi = t.AABB.y + t.AABB.height;
                     float pHi = vRect.y + vRect.height;
                     float up = pHi - tHi; 
-                    float down = vRect.y - t.AABB.y;
+                    float down = t.AABB.y - vRect.y;
                     if (up >= 0) t.CollisionFlags |= 8;
                     if (down >= 0) t.CollisionFlags |= 4;
-                    if (!t.CollisionUp() && !t.CollisionDown()) t.CollisionFlags |= 8|4;
+//                    if (!t.CollisionUp() && !t.CollisionDown()) t.CollisionFlags |= 8+4;
                 }
                 if (t.AABB.overlaps(hRect)) {
                     //check if it's a left hit or a right hit
                     float tRi = t.AABB.x + t.AABB.width;
                     float pRi = hRect.x + hRect.width;
-                    float left = hRect.x - t.AABB.x;
+                    float left =  t.AABB.x - hRect.x;
                     float right = pRi - tRi;
                     if (left <= 0) t.CollisionFlags |= 2;
                     if (right <= 0) t.CollisionFlags |= 1;
-                    if (!t.CollisionLeft() && !t.CollisionRight()) t.CollisionFlags |= 2|1;
+//                    if (!t.CollisionLeft() && !t.CollisionRight()) t.CollisionFlags |= 2+1;
                 }
                 CollisionTiles.add(t);
             }
-            //second pass
-            for (int i=0; i<len; ++i) {
-                //this removes non-colliders and finds where things are pushing this
-                TMPCO t = CollisionTiles.poll();
-                if (t.CollisionFlags != 0) {
-                    //adjust position here
-                    CollisionTiles.add(t);
+            
+            for (int j=0; j<2; ++j) {
+                //second pass
+                len = CollisionTiles.size();
+                for (int i=0; i<len; ++i) {
+                    //this removes non-colliders and finds where things are pushing this
+                    TMPCO t = CollisionTiles.poll();
+                    if (t.CollisionFlags != 0) {
+                        //adjust position if it still overlaps
+                        if ( t.AABB.overlaps(new Rectangle(AABB).setPosition(Position.cpy().add(AABB.x, AABB.y))) ) {
+                            if ( (j == 0 && VerticalFirst) || (j == 1 && !VerticalFirst) ) {
+                                //vertical shunting
+                                if (t.CollisionUp() && !t.CollisionDown()) {
+                                    //top of block
+                                    Position.y +=  t.AABB.y + t.AABB.height - (Position.y + AABB.y);
+                                }
+                                else if (t.CollisionDown() && !t.CollisionUp()) {
+                                    //bottom of block
+                                    Position.y -= Position.y + AABB.y + AABB.height - t.AABB.y;
+                                }
+                            }
+                            else {
+                                //horizontal shunting
+                                if (t.CollisionRight() && !t.CollisionLeft()) {
+                                    //left side of block
+                                    Position.x -= Position.x + AABB.x + AABB.width - t.AABB.x;
+                                }
+                                else if (t.CollisionLeft() && !t.CollisionRight()) {
+                                    //right side of block
+                                    Position.x +=  t.AABB.x + t.AABB.width - (Position.x + AABB.x);
+                                }
+                            }
+                            CollisionTiles.add(t);
+                        }
+                    }
                 }
             }
             //do entity collisions

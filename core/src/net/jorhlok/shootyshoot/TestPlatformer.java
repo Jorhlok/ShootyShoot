@@ -10,16 +10,15 @@ public class TestPlatformer extends Physical {
     
     public TestPlatformer() {
         AABB.set(0,0,1,1);
-        Tolerance.set(0.1f, 0.1f);
-        Position.set(3, 8);
+        Tolerance.set(0.5f, 0.5f);
+        Position.set(5, 8);
         Gravity = new Vector2 (0, -1f);
-        Velocity.set(0, -2f);
+        Velocity.set(3f, -2f);
     }
     
     @Override
     public void step(float deltatime) {
         int len = CollisionTiles.size();
-        System.err.println(CollisionTiles.toString());
         //ignore non-tiles
         for (int i=0; i<len; ++i) {
             TMPCO tmp = CollisionTiles.poll();
@@ -27,7 +26,6 @@ public class TestPlatformer extends Physical {
                 CollisionTiles.add(tmp);
             }
         }
-        System.out.println(CollisionTiles.toString());
     }
     
     @Override
