@@ -50,7 +50,7 @@ public class ShootyShoot extends ApplicationAdapter {
         mav.setCamPos(campos);
         mav.setMusVolume(0.5f);
         
-        dm = new TestDM("map/test0.tmx",null);
+        dm = new TestDM("map/test1.tmx",null);
         Map<String,Class<? extends Entity> > etypes;
         etypes = new HashMap<String,Class<? extends Entity> >();
         etypes.put("TestPlatformer", TestPlatformer.class);

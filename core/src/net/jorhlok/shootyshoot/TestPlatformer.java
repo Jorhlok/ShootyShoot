@@ -11,20 +11,23 @@ public class TestPlatformer extends Physical {
     public TestPlatformer() {
         AABB.set(0,0,1,1);
         Tolerance.set(0.1f, 0.1f);
-        Position.set(3, 12);
-        Gravity = new Vector2 (0, 1f);
-        Velocity.set(0, 10f);
-        Physics = true;
+        Position.set(3, 8);
+        Gravity = new Vector2 (0, -1f);
+        Velocity.set(0, -2f);
     }
     
     @Override
     public void step(float deltatime) {
         int len = CollisionTiles.size();
+        System.err.println(CollisionTiles.toString());
         //ignore non-tiles
         for (int i=0; i<len; ++i) {
             TMPCO tmp = CollisionTiles.poll();
-            if (tmp != null && tmp.cell != null) CollisionTiles.add(tmp);
+            if (tmp != null && tmp.cell != null) {
+                CollisionTiles.add(tmp);
+            }
         }
+        System.out.println(CollisionTiles.toString());
     }
     
     @Override

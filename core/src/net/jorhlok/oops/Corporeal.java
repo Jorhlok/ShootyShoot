@@ -39,7 +39,7 @@ public class Corporeal extends Entity {
     
     protected void doCorporealPhysics(float deltatime) {
         //apply velocity
-        Position.add(Velocity.scl(deltatime));
+        Position.add(Velocity.cpy().scl(deltatime));
         //apply friction
         if (Velocity.x > 0) {
             Velocity.x -= Friction.x*deltatime;
