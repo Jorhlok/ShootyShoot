@@ -19,50 +19,66 @@ public class TestDM extends DungeonMaster {
     }
     
     @Override
+    public void begin() {
+        render = new OrthogonalTiledMapRenderer(Level,1/16f,Parent.MAV.getBatch());
+        render.setView(cam);
+        
+        Entity e = mkEntity("testplat","player","player");
+    }
+    
+    @Override
     public void update(float deltatime) {
         //poll input
-        if ((Gdx.input.isKeyPressed(Input.Keys.SPACE)) || (Gdx.input.isKeyPressed(Input.Keys.UP)) 
-                || (Gdx.input.isKeyPressed(Input.Keys.W))) {
-            for ( Entity e : Living.get("player") ) {
-                e.Mailbox.add(new Postage(null,"jump","control",1));
+        try {
+            if ((Gdx.input.isKeyPressed(Input.Keys.SPACE)) || (Gdx.input.isKeyPressed(Input.Keys.UP)) 
+                    || (Gdx.input.isKeyPressed(Input.Keys.W))) {
+                for ( Entity e : Living.get("player") ) {
+                    e.Mailbox.add(new Postage(null,"jump","control",1));
+                }
+            } else {
+                for ( Entity e : Living.get("player") ) {
+                    e.Mailbox.add(new Postage(null,"jump","control",0));
+                }
             }
-        } else {
-            for ( Entity e : Living.get("player") ) {
-                e.Mailbox.add(new Postage(null,"jump","control",0));
-            }
-        }
 
-        if ((Gdx.input.isKeyPressed(Input.Keys.RIGHT)) || (Gdx.input.isKeyPressed(Input.Keys.D))) {
-            for ( Entity e : Living.get("player") ) {
-                e.Mailbox.add(new Postage(null,"right","control",1));
+            if ((Gdx.input.isKeyPressed(Input.Keys.RIGHT)) || (Gdx.input.isKeyPressed(Input.Keys.D))) {
+                for ( Entity e : Living.get("player") ) {
+                    e.Mailbox.add(new Postage(null,"right","control",1));
+                }
+            } else {
+                for ( Entity e : Living.get("player") ) {
+                    e.Mailbox.add(new Postage(null,"right","control",0));
+                }
             }
-        } else {
-            for ( Entity e : Living.get("player") ) {
-                e.Mailbox.add(new Postage(null,"right","control",0));
-            }
-        }
 
-        if ((Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.A))) {
-            for ( Entity e : Living.get("player") ) {
-                e.Mailbox.add(new Postage(null,"left","control",1));
+            if ((Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.A))) {
+                for ( Entity e : Living.get("player") ) {
+                    e.Mailbox.add(new Postage(null,"left","control",1));
+                }
+            } else {
+                for ( Entity e : Living.get("player") ) {
+                    e.Mailbox.add(new Postage(null,"left","control",0));
+                }
             }
-        } else {
-            for ( Entity e : Living.get("player") ) {
-                e.Mailbox.add(new Postage(null,"left","control",0));
-            }
-        }
-        //update objects
+            //update objects
             for ( Entity e : Living.get("player") ) {
                 e.update(deltatime);
             }
+        } catch (Exception e) {
+            System.err.println("Unable to update in TestDM because:\n" + e.toString() + "\n" + e.getMessage());
+        }
     }
     
     @Override
     public void draw(float deltatime, MultiAVRegister msr) {
         render.render();
         msr.getBatch().begin();
-        for ( Entity e : Living.get("player") ) {
-            e.draw(msr);
+        try {
+            for ( Entity e : Living.get("player") ) {
+                e.draw(msr);
+            }
+        } catch (Exception e) {
+            //meh
         }
         msr.getBatch().end();
     }

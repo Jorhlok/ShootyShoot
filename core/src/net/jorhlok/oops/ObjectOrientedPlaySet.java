@@ -1,6 +1,7 @@
 package net.jorhlok.oops;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import java.util.HashMap;
 import java.util.Map;
 import net.jorhlok.multiav.MultiAVRegister;
 
@@ -12,33 +13,50 @@ import net.jorhlok.multiav.MultiAVRegister;
  */
 public class ObjectOrientedPlaySet {
     //setup
-    public Map<String,TiledMap> TileMap;
-    public Map<String, Class<? extends Entity> > EntityType;
-    public Map<String,DungeonMaster> MasterScript;
+    public Map<String,TiledMap> TileMap = new HashMap<String,TiledMap>();
+    public Map<String, Class<? extends Entity> > EntityType = new HashMap<String, Class<? extends Entity> >();
+    public Map<String,DungeonMaster> MasterScript = new HashMap<String,DungeonMaster>();
     
     //runtime
     public MultiAVRegister MAV;
-    public DungeonMaster Here;
+    public DungeonMaster Here = null;
         //something about input here
     
     public void addTileMap(String key, TiledMap map) {
-        
+        TileMap.put(key, map);
     }
     
     public void addEntityType(String key, Class<? extends Entity> clazz) {
-        
+        EntityType.put(key, clazz);
     }
     
     public void addMasterScript(String key, DungeonMaster script) {
-        
+        script.Parent = this;
+        MasterScript.put(key, script);
+    }
+    
+    public void setMAV(MultiAVRegister mav) {
+        MAV = mav;
     }
     
     public void step(float deltatime) {
-        
+        if (Here != null) Here.update(deltatime);
     }
     
     public void draw(float deltatime) {
-        
+        if (Here != null) Here.draw(deltatime, MAV);
+    }
+    
+    public void launchScript(String key) {
+        if (Here != null) {
+            Here.end();
+            Here.dispose();
+        }
+        Here = MasterScript.get(key);
+        if (Here != null) {
+            Here.create(TileMap, EntityType);
+            Here.begin();
+        }
     }
     
     /**

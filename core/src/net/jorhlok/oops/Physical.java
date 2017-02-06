@@ -23,6 +23,7 @@ public class Physical extends Corporeal {
     @Override
     public void update(float deltatime) {
         prestep(deltatime); //anything beforehand
+        
         if (Physics) {
             PrePosition.set(Position);
             PreVelocity.set(Velocity);
@@ -33,7 +34,9 @@ public class Physical extends Corporeal {
             //collect tiles from area of interest
             Maestro.PhysicalCollisions(CollisionTiles,aoi,projected);
         }
+        
         step(deltatime); //object specific tile checking
+        
         if (Physics) {
             //do tile collisions
             int len = CollisionTiles.size();
@@ -42,8 +45,7 @@ public class Physical extends Corporeal {
                     AABB.width*Tolerance.x, AABB.height);
             Rectangle hRect = new Rectangle(AABB.x+Position.x, AABB.y+Position.y + AABB.height*Tolerance.y/2, 
                     AABB.width, AABB.height*Tolerance.y);
-            System.err.println(vRect.toString());
-            System.out.println(hRect.toString() + "\n");
+            
             //first pass
             for (int i=0; i<len; ++i){
                 TMPCO t = CollisionTiles.poll();
@@ -73,8 +75,8 @@ public class Physical extends Corporeal {
                 CollisionTiles.add(t);
             }
             
+            //second pass
             for (int j=0; j<2; ++j) {
-                //second pass
                 len = CollisionTiles.size();
                 for (int i=0; i<len; ++i) {
                     //this removes non-colliders and finds where things are pushing this
@@ -117,7 +119,9 @@ public class Physical extends Corporeal {
             //do entity collisions
             Maestro.CorporealCollisions(CollidesWith,CollideQueue,AABB);
         }
+        
         poststep(deltatime); //real interaction goes in here
+        
         //clear queues
         Mailbox.clear();
         CollideQueue.clear();

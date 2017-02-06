@@ -2,6 +2,7 @@ package net.jorhlok.shootyshoot;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.Hinting;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import net.jorhlok.multiav.MultiAVRegister;
 import net.jorhlok.oops.Entity;
+import net.jorhlok.oops.ObjectOrientedPlaySet;
 
 
 
@@ -32,9 +35,10 @@ public class ShootyShoot extends ApplicationAdapter {
 //    float sfxtime = 0f;
 //    boolean musplay = false;
     
-    TestDM dm;
-    TestPlatformer plat;
-    TiledMap testmap;
+//    TestDM dm;
+//    TestPlatformer plat;
+//    TiledMap testmap;
+    ObjectOrientedPlaySet oops;
 
     @Override
     public void create () {
@@ -50,18 +54,27 @@ public class ShootyShoot extends ApplicationAdapter {
         mav.setCamPos(campos);
         mav.setMusVolume(0.5f);
         
-        dm = new TestDM("map/test1.tmx",null);
-        Map<String,Class<? extends Entity> > etypes;
-        etypes = new HashMap<String,Class<? extends Entity> >();
-        etypes.put("TestPlatformer", TestPlatformer.class);
-        dm.create(null, etypes);
-        dm.Living.put("player", new LinkedList<Entity>());
+        oops = new ObjectOrientedPlaySet();
+        oops.setMAV(mav);
+        oops.addTileMap("test0", new TmxMapLoader(new InternalFileHandleResolver()).load("map/test0.tmx"));
+        oops.addTileMap("test1", new TmxMapLoader(new InternalFileHandleResolver()).load("map/test1.tmx"));
+        oops.addEntityType("testplat", TestPlatformer.class);
+        
+        TestDM dm = new TestDM("test1",null);
+//        Map<String,Class<? extends Entity> > etypes;
+//        etypes = new HashMap<String,Class<? extends Entity> >();
+//        etypes.put("TestPlatformer", TestPlatformer.class);
+//        dm.create(null, etypes);
+//        dm.Living.put("player", new LinkedList<Entity>());
         dm.cam = camera;
-        dm.render = new OrthogonalTiledMapRenderer(dm.Level,1/16f,batch);
-        dm.render.setView(camera);
-        plat = new TestPlatformer();
-        dm.Living.get("player").add(plat);
-        plat.Maestro = dm;
+//        dm.render = new OrthogonalTiledMapRenderer(dm.Level,1/16f,batch);
+//        dm.render.setView(camera);
+        
+//        plat = new TestPlatformer();
+//        dm.Living.get("player").add(plat);
+//        plat.Maestro = dm;
+        oops.addMasterScript("testdm", dm);
+        oops.launchScript("testdm");
     }
 
     @Override
@@ -73,12 +86,14 @@ public class ShootyShoot extends ApplicationAdapter {
         
         //game logic
 //        plat.update(deltatime);
-        dm.update(deltatime);
+//        dm.update(deltatime);
+        oops.step(deltatime);
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         try {
-            dm.draw(deltatime, mav);
+            oops.draw(deltatime);
+//            dm.draw(deltatime, mav);
         } catch (Exception e) {
             e.printStackTrace();
         }

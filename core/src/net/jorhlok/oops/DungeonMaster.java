@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -22,6 +23,7 @@ import net.jorhlok.multiav.MultiAVRegister;
  */
 public class DungeonMaster {
     //setup
+    public ObjectOrientedPlaySet Parent;
     public Map<Integer,String> TileEntityMapping;
     public String MapName;
     public String StrTerrain = "Terrain";
@@ -36,16 +38,27 @@ public class DungeonMaster {
     public MapLayer LyrNonTiles;
     public Map<String, List<Entity> > Living;
     
+    public DungeonMaster() {
+        
+    }
+    
     public DungeonMaster(String mapname, Map<Integer,String> temap) {
+        this(mapname,temap,null,null,null);
+    }
+    
+    public DungeonMaster(String mapname, Map<Integer,String> temap, String terr, String tile, String nontile) {
         Living = new HashMap<String, List<Entity> >();
         MapName = mapname;
         TileEntityMapping = temap;
+        if (terr != null) StrTerrain = terr;
+        if (tile != null) StrTileObjects = tile;
+        if (nontile != null) StrNonTiles = nontile;
     }
     
     public void create(Map<String,TiledMap> maps, Map<String, Class<? extends Entity> > etypes) {
         eTypes = etypes;
         try {
-            Level = new TmxMapLoader(new InternalFileHandleResolver()).load(MapName);
+            Level = maps.get(MapName);
             try {
                 LyrTerrain = (TiledMapTileLayer) Level.getLayers().get(StrTerrain);
             } catch (Exception e) {
@@ -167,5 +180,26 @@ public class DungeonMaster {
         } catch (Exception e) {
             //nothing
         }
+    }
+    
+    public Entity mkEntity (String key, String category) {
+        return mkEntity(key,category,"");
+    }
+    
+    public Entity mkEntity (String key, String category, String name) {
+        if (Parent == null) return null;
+        Entity e = Parent.mkentity(key);
+        if (e != null) {
+            e.Maestro = this;
+            e.Name = name;
+            e.Type = key;
+            List<Entity> ls = Living.get(category);
+            if (ls == null) {
+                ls = new LinkedList<Entity>();
+                Living.put(category, ls);
+            }
+            ls.add(e);
+        }
+        return e;
     }
 }
