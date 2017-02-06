@@ -39,9 +39,11 @@ public class Physical extends Corporeal {
             int len = CollisionTiles.size();
             CollisionFlags = 0;
             Rectangle vRect = new Rectangle(AABB.x+Position.x + AABB.width*Tolerance.x/2, AABB.y+Position.y, 
-                    AABB.width - AABB.width*Tolerance.x/2, AABB.height);
+                    AABB.width*Tolerance.x, AABB.height);
             Rectangle hRect = new Rectangle(AABB.x+Position.x, AABB.y+Position.y + AABB.height*Tolerance.y/2, 
-                    AABB.width, AABB.height - AABB.height*Tolerance.y/2);
+                    AABB.width, AABB.height*Tolerance.y);
+            System.err.println(vRect.toString());
+            System.out.println(hRect.toString() + "\n");
             //first pass
             for (int i=0; i<len; ++i){
                 TMPCO t = CollisionTiles.poll();
@@ -52,9 +54,10 @@ public class Physical extends Corporeal {
                     float pHi = vRect.y + vRect.height;
                     float up = pHi - tHi; 
                     float down = t.AABB.y - vRect.y;
-                    if (up >= 0) t.CollisionFlags |= 8;
-                    if (down >= 0) t.CollisionFlags |= 4;
-//                    if (!t.CollisionUp() && !t.CollisionDown()) t.CollisionFlags |= 8+4;
+                    if (Velocity.y < 0 || ( Velocity.y >= 0 && up >= 0 ) ) t.CollisionFlags |= 8;
+                    if (Velocity.y > 0 || ( Velocity.y <= 0 && down >= 0 ) ) t.CollisionFlags |= 4;
+                    if (!t.CollisionUp() && !t.CollisionDown()) t.CollisionFlags |= 8+4;
+                    CollisionFlags |= t.CollisionFlags;
                 }
                 if (t.AABB.overlaps(hRect)) {
                     //check if it's a left hit or a right hit
@@ -62,9 +65,10 @@ public class Physical extends Corporeal {
                     float pRi = hRect.x + hRect.width;
                     float left =  t.AABB.x - hRect.x;
                     float right = pRi - tRi;
-                    if (left <= 0) t.CollisionFlags |= 2;
-                    if (right <= 0) t.CollisionFlags |= 1;
-//                    if (!t.CollisionLeft() && !t.CollisionRight()) t.CollisionFlags |= 2+1;
+                    if (Velocity.x > 0 || ( Velocity.x <= 0 && left >= 0 ) ) t.CollisionFlags |= 2;
+                    if (Velocity.x < 0 || ( Velocity.x >= 0 && right >= 0 ) ) t.CollisionFlags |= 1;
+                    if (!t.CollisionLeft() && !t.CollisionRight()) t.CollisionFlags |= 2+1;
+                    CollisionFlags |= t.CollisionFlags;
                 }
                 CollisionTiles.add(t);
             }
@@ -74,8 +78,10 @@ public class Physical extends Corporeal {
                 len = CollisionTiles.size();
                 for (int i=0; i<len; ++i) {
                     //this removes non-colliders and finds where things are pushing this
+                    
                     TMPCO t = CollisionTiles.poll();
                     if (t.CollisionFlags != 0) {
+                        CollisionTiles.add(t);
                         //adjust position if it still overlaps
                         if ( t.AABB.overlaps(new Rectangle(AABB).setPosition(Position.cpy().add(AABB.x, AABB.y))) ) {
                             if ( (j == 0 && VerticalFirst) || (j == 1 && !VerticalFirst) ) {
@@ -94,17 +100,16 @@ public class Physical extends Corporeal {
                             else {
                                 //horizontal shunting
                                 if (t.CollisionRight() && !t.CollisionLeft()) {
-                                    //left side of block
-                                    Position.x -= Position.x + AABB.x + AABB.width - t.AABB.x;
-                                    Velocity.x = 0;
-                                }
-                                else if (t.CollisionLeft() && !t.CollisionRight()) {
                                     //right side of block
                                     Position.x +=  t.AABB.x + t.AABB.width - (Position.x + AABB.x);
                                     Velocity.x = 0;
                                 }
+                                else if (t.CollisionLeft() && !t.CollisionRight()) {
+                                    //left side of block
+                                    Position.x -= Position.x + AABB.x + AABB.width - t.AABB.x;
+                                    Velocity.x = 0;
+                                }
                             }
-                            CollisionTiles.add(t);
                         }
                     }
                 }

@@ -31,9 +31,10 @@ public class TestPlatformer extends Physical {
                 if (p.Name.equals("jump")) {
                     boolean oldjump = jump;
                     jump = p.iValue != 0;
-                    if (Grounded && jump && !oldjump) {
+                    if (/*Grounded &&*/ jump && !oldjump) {
                         //jump!
-                        Velocity.add(0, 10);
+                        Velocity.add(0, 16);
+                        if (Velocity.y > 16) Velocity.y = 16;
                         Grounded = false;
                     }
                 } else if (p.Name.equals("left")) {
