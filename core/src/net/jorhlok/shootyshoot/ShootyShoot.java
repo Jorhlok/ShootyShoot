@@ -28,9 +28,9 @@ public class ShootyShoot extends ApplicationAdapter {
     private final OrthographicCamera camera = new OrthographicCamera();
     private final Vector2 campos = new Vector2();
     
-    float time = 0;
-    float sfxtime = 0f;
-    boolean musplay = false;
+//    float time = 0;
+//    float sfxtime = 0f;
+//    boolean musplay = false;
     
     TestDM dm;
     TestPlatformer plat;
@@ -50,7 +50,7 @@ public class ShootyShoot extends ApplicationAdapter {
         mav.setCamPos(campos);
         mav.setMusVolume(0.5f);
         
-        dm = new TestDM("map/test1.tmx",null);
+        dm = new TestDM("map/test0.tmx",null);
         Map<String,Class<? extends Entity> > etypes;
         etypes = new HashMap<String,Class<? extends Entity> >();
         etypes.put("TestPlatformer", TestPlatformer.class);
@@ -72,24 +72,26 @@ public class ShootyShoot extends ApplicationAdapter {
         float deltatime = Gdx.graphics.getDeltaTime();
         
         //game logic
-        plat.update(deltatime);
+//        plat.update(deltatime);
+        dm.update(deltatime);
 
         camera.update();
+        batch.setProjectionMatrix(camera.combined);
         try {
             dm.draw(deltatime, mav);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        plat.draw(mav);
+//        batch.begin();
+//        plat.draw(mav);
 //        mav.draw("_greenblock", time, 320/16, 180/16, 640/16, 1, time*30);
 //        mav.drawString("||Hello, World||\n||\t||", 320/16, 180/16, 2, 1, time*30);
 //        mav.draw("_greyblock", 0, 1, 1, 1, 1);
 //        mav.draw("_alchemy", 0, 2, 2, 2, 2);
 //        mav.draw("pacrt", time, 6, 2, 1, 1);
-        time += deltatime;
-        batch.end();
+//        batch.end();
+        
+//        time += deltatime;
         
 //        if (sfxtime >= 9) {
 //            mav.setSFXVolume(0.33333f);
@@ -98,11 +100,11 @@ public class ShootyShoot extends ApplicationAdapter {
 //        }
 //        else sfxtime += deltatime;
         
-        if (!musplay) {
-            musplay = true;
-            mav.getMus("frcasio").Generate();
-            mav.getMus("frcasio").play(true);
-        }
+//        if (!musplay) {
+//            musplay = true;
+//            mav.getMus("frcasio").Generate();
+//            mav.getMus("frcasio").play(true);
+//        }
     }
     
     @Override

@@ -83,10 +83,12 @@ public class Physical extends Corporeal {
                                 if (t.CollisionUp() && !t.CollisionDown()) {
                                     //top of block
                                     Position.y +=  t.AABB.y + t.AABB.height - (Position.y + AABB.y);
+                                    Velocity.y = 0;
                                 }
                                 else if (t.CollisionDown() && !t.CollisionUp()) {
                                     //bottom of block
                                     Position.y -= Position.y + AABB.y + AABB.height - t.AABB.y;
+                                    Velocity.y = 0;
                                 }
                             }
                             else {
@@ -94,10 +96,12 @@ public class Physical extends Corporeal {
                                 if (t.CollisionRight() && !t.CollisionLeft()) {
                                     //left side of block
                                     Position.x -= Position.x + AABB.x + AABB.width - t.AABB.x;
+                                    Velocity.x = 0;
                                 }
                                 else if (t.CollisionLeft() && !t.CollisionRight()) {
                                     //right side of block
                                     Position.x +=  t.AABB.x + t.AABB.width - (Position.x + AABB.x);
+                                    Velocity.x = 0;
                                 }
                             }
                             CollisionTiles.add(t);

@@ -90,6 +90,10 @@ public class DungeonMaster {
         
     }
     
+    public void update(float deltatime) {
+        
+    }
+    
     public void draw(float deltatime, MultiAVRegister msr) {
         
     }
