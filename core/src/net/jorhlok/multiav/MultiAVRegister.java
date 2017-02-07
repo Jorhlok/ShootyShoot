@@ -253,6 +253,7 @@ public class MultiAVRegister {
     
     public void dispose() {
         Font.dispose();
+        MyBatch.dispose();
         for (TexGrid t : Image.values())
             t.dispose();
         for (SprFrame s : Frame.values())

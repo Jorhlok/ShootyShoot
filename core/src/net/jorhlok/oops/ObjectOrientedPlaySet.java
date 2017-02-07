@@ -20,7 +20,6 @@ public class ObjectOrientedPlaySet {
     //runtime
     public MultiAVRegister MAV;
     public DungeonMaster Here = null;
-        //something about input here
     
     public void addTileMap(String key, TiledMap map) {
         TileMap.put(key, map);
@@ -69,5 +68,18 @@ public class ObjectOrientedPlaySet {
             System.err.println("Unable to make a new " + key + " because:\n" + e.toString());
             return null;
         }
+    }
+    
+    public void dispose() {
+        if (Here != null) {
+            Here.end();
+            Here.dispose();
+        }
+        for (TiledMap t : TileMap.values()) {
+            t.dispose();
+        }
+        TileMap.clear();
+        EntityType.clear();
+        MasterScript.clear();
     }
 }

@@ -90,18 +90,6 @@ public class DungeonMaster {
     public void dispose() {
         
     }
-
-    public void prestep(float deltatime) {
-        
-    }
-    
-    public void step(float deltatime) {
-        
-    }
-
-    public void poststep(float deltatime) {
-        
-    }
     
     public void update(float deltatime) {
         

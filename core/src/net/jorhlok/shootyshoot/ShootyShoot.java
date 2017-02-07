@@ -7,37 +7,20 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.Hinting;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import net.jorhlok.multiav.MultiAVRegister;
-import net.jorhlok.oops.Entity;
 import net.jorhlok.oops.ObjectOrientedPlaySet;
 
 
 
 public class ShootyShoot extends ApplicationAdapter {
-    SpriteBatch batch;
-    BitmapFont font;
     MultiAVRegister mav;
     private final OrthographicCamera camera = new OrthographicCamera();
     private final Vector2 campos = new Vector2();
-    
-//    float time = 0;
-//    float sfxtime = 0f;
-//    boolean musplay = false;
-    
-//    TestDM dm;
-//    TestPlatformer plat;
-//    TiledMap testmap;
     ObjectOrientedPlaySet oops;
 
     @Override
@@ -45,8 +28,7 @@ public class ShootyShoot extends ApplicationAdapter {
         mav = new MultiAVRegister();
         mkav();
         mav.Generate();
-        batch = new SpriteBatch();
-        mav.setBatch(batch);
+        mav.setBatch(new SpriteBatch());
         camera.setToOrtho(false, 640/16, 360/16);
         camera.position.x = campos.x = 640/32;
         camera.position.y = campos.y = 360/32;
@@ -61,18 +43,7 @@ public class ShootyShoot extends ApplicationAdapter {
         oops.addEntityType("testplat", TestPlatformer.class);
         
         TestDM dm = new TestDM("test1",null);
-//        Map<String,Class<? extends Entity> > etypes;
-//        etypes = new HashMap<String,Class<? extends Entity> >();
-//        etypes.put("TestPlatformer", TestPlatformer.class);
-//        dm.create(null, etypes);
-//        dm.Living.put("player", new LinkedList<Entity>());
         dm.cam = camera;
-//        dm.render = new OrthogonalTiledMapRenderer(dm.Level,1/16f,batch);
-//        dm.render.setView(camera);
-        
-//        plat = new TestPlatformer();
-//        dm.Living.get("player").add(plat);
-//        plat.Maestro = dm;
         oops.addMasterScript("testdm", dm);
         oops.launchScript("testdm");
     }
@@ -85,41 +56,16 @@ public class ShootyShoot extends ApplicationAdapter {
         float deltatime = Gdx.graphics.getDeltaTime();
         
         //game logic
-//        plat.update(deltatime);
-//        dm.update(deltatime);
         oops.step(deltatime);
 
         camera.update();
-        batch.setProjectionMatrix(camera.combined);
+        mav.getBatch().setProjectionMatrix(camera.combined);
         try {
             oops.draw(deltatime);
-//            dm.draw(deltatime, mav);
         } catch (Exception e) {
+            System.err.println("Error drawing!");
             e.printStackTrace();
         }
-//        batch.begin();
-//        plat.draw(mav);
-//        mav.draw("_greenblock", time, 320/16, 180/16, 640/16, 1, time*30);
-//        mav.drawString("||Hello, World||\n||\t||", 320/16, 180/16, 2, 1, time*30);
-//        mav.draw("_greyblock", 0, 1, 1, 1, 1);
-//        mav.draw("_alchemy", 0, 2, 2, 2, 2);
-//        mav.draw("pacrt", time, 6, 2, 1, 1);
-//        batch.end();
-        
-//        time += deltatime;
-        
-//        if (sfxtime >= 9) {
-//            mav.setSFXVolume(0.33333f);
-//            mav.playSFX("jump");
-//            sfxtime = 0;
-//        }
-//        else sfxtime += deltatime;
-        
-//        if (!musplay) {
-//            musplay = true;
-//            mav.getMus("frcasio").Generate();
-//            mav.getMus("frcasio").play(true);
-//        }
     }
     
     @Override
@@ -129,7 +75,8 @@ public class ShootyShoot extends ApplicationAdapter {
 
     @Override
     public void dispose () {
-            batch.dispose();
+        oops.dispose();
+        mav.dispose();
     }
 
     public void mkav() {
@@ -147,9 +94,9 @@ public class ShootyShoot extends ApplicationAdapter {
         parameter.genMipMaps = true;
         parameter.magFilter = Texture.TextureFilter.Nearest;
         parameter.minFilter = Texture.TextureFilter.Linear;
-        //parameter.characters = parameter.characters + ",▄■";
+        //parameter.characters = parameter.characters + "▄■";
         parameter.hinting = Hinting.Full;
-        mav.setFont(font = generator.generateFont(parameter), parameter.characters);
+        mav.setFont(generator.generateFont(parameter), parameter.characters);
         mav.setFontSampling(6f);
         generator.dispose();
 
