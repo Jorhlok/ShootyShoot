@@ -17,7 +17,7 @@ public class AnimSeq {
     protected Animation.PlayMode PlayMode;
     
     //generated
-    protected Animation Anim;
+    protected Animation<TextureRegion> Anim;
     
     public AnimSeq(String key, String[] frames, float speed, Animation.PlayMode mode) {
         Name = key;

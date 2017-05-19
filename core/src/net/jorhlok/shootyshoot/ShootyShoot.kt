@@ -48,7 +48,6 @@ class ShootyShoot
         oops.addMasterScript("testdm", dm)
         oops.launchScript("testdm")
 
-        System.out.println("hullo from kotlin")
     }
 
 
