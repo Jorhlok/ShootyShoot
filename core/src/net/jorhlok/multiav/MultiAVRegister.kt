@@ -12,9 +12,9 @@ import java.util.HashMap
  * @author Jorhlok
  */
 class MultiAVRegister {
-    protected var Image: MutableMap<String, TexGrid>
-    protected var Frame: MutableMap<String, SprFrame>
-    protected var Anim: MutableMap<String, AnimSeq>
+    protected var image: MutableMap<String, TexGrid>
+    protected var frameJ: MutableMap<String, jSprFrame>
+    protected var jAnim: MutableMap<String, jAnimSeq>
     protected var Letters: MutableMap<Char, TextureRegion>
     protected var SFX: MutableMap<String, SEffect>
     protected var Mus: MutableMap<String, MTrack>
@@ -28,26 +28,25 @@ class MultiAVRegister {
     var fontSampling = 1f
 
     init {
-        Image = HashMap<String, TexGrid>()
-        Frame = HashMap<String, SprFrame>()
-        Anim = HashMap<String, AnimSeq>()
+        image = HashMap<String, TexGrid>()
+        frameJ = HashMap<String, jSprFrame>()
+        jAnim = HashMap<String, jAnimSeq>()
         Letters = HashMap<Char, TextureRegion>()
         SFX = HashMap<String, SEffect>()
         Mus = HashMap<String, MTrack>()
     }
 
     fun newImage(key: String, uri: String, tw: Int, th: Int) {
-        val i = Image[key]
-        i?.dispose()
-        Image.put(key, TexGrid(key, uri, tw, th))
+        image[key]?.dispose()
+        image.put(key, TexGrid(key, uri, tw, th))
     }
 
     fun newSprite(key: String, img: String, tx: Int, ty: Int, tw: Int, th: Int, hf: Boolean, vf: Boolean) {
-        Frame.put(key, SprFrame(key, img, tx, ty, tw, th, hf, vf))
+        frameJ.put(key, jSprFrame(key, img, tx, ty, tw, th, hf, vf))
     }
 
     fun newAnim(key: String, frames: Array<String>, speed: Float, mode: Animation.PlayMode?) {
-        Anim.put(key, AnimSeq(key, frames, speed, mode))
+        jAnim.put(key, jAnimSeq(key, frames, speed, mode))
     }
 
     fun setFont(f: BitmapFont, chars: String) {
@@ -75,14 +74,14 @@ class MultiAVRegister {
     }
 
     fun Generate() {
-        for (t in Image.values)
+        for (t in image.values)
             t.Generate()
-        for (s in Frame.values) {
-            s.Generate(Image)
+        for (s in frameJ.values) {
+//            s.Generate(image)
             newAnim("_" + s.Name, arrayOf(s.Name), 0f, null) //auto generate single frame animation for each frame
         }
-        for (a in Anim.values)
-            a.Generate(Frame)
+        for (a in jAnim.values)
+            a.Generate(frameJ)
         if (Font != null && DrawableChars != null && !DrawableChars!!.isEmpty()) {
             val dat = Font!!.data
             for (i in 0..DrawableChars!!.length - 1) {
@@ -107,7 +106,7 @@ class MultiAVRegister {
         var x = x
         var y = y
         try {
-            val reg = Anim[anim]?.getKeyFrame(statetime)
+            val reg = jAnim[anim]?.getKeyFrame(statetime)
             if (reg != null) {
                 x += (reg.regionHeight.toDouble() * scale.y.toDouble() * sh.toDouble() * Math.sin(Math.toRadians((-1 * rot).toDouble()))).toFloat()
                 y += (reg.regionHeight.toDouble() * scale.y.toDouble() * sh.toDouble() * Math.cos(Math.toRadians((-1 * rot).toDouble()))).toFloat()
@@ -193,11 +192,11 @@ class MultiAVRegister {
     fun dispose() {
         Font?.dispose()
         batch?.dispose()
-        for (t in Image.values)
+        for (t in image.values)
             t.dispose()
-        for (s in Frame.values)
+        for (s in frameJ.values)
             s.dispose()
-        for (a in Anim.values)
+        for (a in jAnim.values)
             a.dispose()
         for (s in SFX.values)
             s.dispose()
