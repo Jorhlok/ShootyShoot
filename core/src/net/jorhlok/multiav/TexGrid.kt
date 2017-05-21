@@ -12,7 +12,7 @@ class TexGrid (
     val Name: String = "",
     val URI: String = "",
     val TWidth: Int = 1,
-    val THeight:Int = 1){
+    val THeight:Int = 1) {
 
     var Tex = HashMap<Short, Texture>()
 
@@ -45,7 +45,7 @@ class TexGrid (
             var p = layers[index.toShort()]
 
             if (p == null) {
-                p = Pixmap(pix.width,pix.height,Pixmap.Format.Alpha)
+                p = Pixmap(pix.width,pix.height,Pixmap.Format.LuminanceAlpha)
                 p.setColor(0f,0f,0f,0f)
                 p.fill()
                 p.setColor(1f,1f,1f,1f)

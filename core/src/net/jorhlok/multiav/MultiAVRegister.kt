@@ -1,9 +1,6 @@
 package net.jorhlok.multiav
 
-import com.badlogic.gdx.graphics.g2d.Animation
-import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.math.Vector2
 import java.util.HashMap
 
@@ -13,7 +10,7 @@ import java.util.HashMap
  */
 class MultiAVRegister {
     protected var image: MutableMap<String, TexGrid>
-    protected var frameJ: MutableMap<String, jSprFrame>
+    var frame = HashMap<String, TileFrame>()
     protected var jAnim: MutableMap<String, jAnimSeq>
     protected var Letters: MutableMap<Char, TextureRegion>
     protected var SFX: MutableMap<String, SEffect>
@@ -29,7 +26,7 @@ class MultiAVRegister {
 
     init {
         image = HashMap<String, TexGrid>()
-        frameJ = HashMap<String, jSprFrame>()
+//        frame = HashMap<String, TileFrame>()
         jAnim = HashMap<String, jAnimSeq>()
         Letters = HashMap<Char, TextureRegion>()
         SFX = HashMap<String, SEffect>()
@@ -41,8 +38,8 @@ class MultiAVRegister {
         image.put(key, TexGrid(key, uri, tw, th))
     }
 
-    fun newSprite(key: String, img: String, tx: Int, ty: Int, tw: Int, th: Int, hf: Boolean, vf: Boolean) {
-        frameJ.put(key, jSprFrame(key, img, tx, ty, tw, th, hf, vf))
+    fun newSprite(key: String, img: String, tx: Int, ty: Int, tw: Int = 1, th: Int = 1, hf: Boolean = false, vf: Boolean = false, rot90: Int = 0) {
+        frame.put(key, TileFrame(key, img, tx, ty, tw, th, hf, vf, rot90))
     }
 
     fun newAnim(key: String, frames: Array<String>, speed: Float, mode: Animation.PlayMode?) {
@@ -74,14 +71,15 @@ class MultiAVRegister {
     }
 
     fun Generate() {
+        batch = SpriteBatch()
         for (t in image.values)
             t.Generate()
-        for (s in frameJ.values) {
-//            s.Generate(image)
+        for (s in frame.values) {
+            s.Generate(image)
             newAnim("_" + s.Name, arrayOf(s.Name), 0f, null) //auto generate single frame animation for each frame
         }
         for (a in jAnim.values)
-            a.Generate(frameJ)
+//            a.Generate(frame)
         if (Font != null && DrawableChars != null && !DrawableChars!!.isEmpty()) {
             val dat = Font!!.data
             for (i in 0..DrawableChars!!.length - 1) {
@@ -194,7 +192,7 @@ class MultiAVRegister {
         batch?.dispose()
         for (t in image.values)
             t.dispose()
-        for (s in frameJ.values)
+        for (s in frame.values)
             s.dispose()
         for (a in jAnim.values)
             a.dispose()

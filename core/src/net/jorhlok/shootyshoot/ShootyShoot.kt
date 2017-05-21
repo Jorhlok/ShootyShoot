@@ -2,30 +2,28 @@ package net.jorhlok.shootyshoot
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Animation
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.Hinting
-import com.badlogic.gdx.maps.tiled.TmxMapLoader
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.utils.Array
 import net.jorhlok.multiav.MultiAVRegister
-import net.jorhlok.oops.ObjectOrientedPlaySet
 
 
 class ShootyShoot : ApplicationAdapter() {
-    private val camera = OrthographicCamera()
-    private val campos = Vector2()
+//    private val camera = OrthographicCamera()
+//    private val campos = Vector2()
     private var mav: MultiAVRegister? = null
-    private var oops: ObjectOrientedPlaySet? = null
+//    private var oops: ObjectOrientedPlaySet? = null
+    var fb: FrameBuffer? = null
+    var fbtr: TextureRegion? = null
+    var bigpal = Array<Color>()
+    var pal = Array<Short>()
+    var statetime = 0f
 
 
     override fun create() {
-        mav = MultiAVRegister()
-        mkav()
+//        mkav()
 //        mav.Generate()
 //        mav.batch = SpriteBatch()
 //        camera.setToOrtho(false, (640 / 16).toFloat(), (360 / 16).toFloat())
@@ -37,7 +35,7 @@ class ShootyShoot : ApplicationAdapter() {
 //        mav.camPos = campos
 //        mav.setMusVolume(0.5f)
 
-        oops = ObjectOrientedPlaySet()
+//        oops = ObjectOrientedPlaySet()
 //        oops.setMAV(mav)
 //        oops.addTileMap("test0", TmxMapLoader(InternalFileHandleResolver()).load("map/test0.tmx"))
 //        oops.addTileMap("test1", TmxMapLoader(InternalFileHandleResolver()).load("map/test1.tmx"))
@@ -47,15 +45,54 @@ class ShootyShoot : ApplicationAdapter() {
 //        dm.cam = camera
 //        oops.addMasterScript("testdm", dm)
 //        oops.launchScript("testdm")
-
+        bigpal.add(Color(0f,0f,0f,0f))
+        bigpal.add(Color(0f,0f,0f,1f))
+        bigpal.add(Color(4/15f,12/15f,2/15f,1f))
+        bigpal.add(Color(13/15f,13/15f,13/15f,1f))
+        bigpal.add(Color(7/15f,8/15f,1f,1f))
+        bigpal.add(Color(0f,0f,0f,1f))
+        bigpal.add(Color(4/15f,12/15f,2/15f,1f))
+        bigpal.add(Color(13/15f,13/15f,13/15f,1f))
+        pal.add(0)
+        pal.add(1)
+        pal.add(4)
+        pal.add(3)
+        mav = MultiAVRegister()
+        mkav()
+        mav?.newImage("imgmap","gfx/imgmap.png",16,16)
+        mav?.newSprite("girl","imgmap",0,0)
+        mav?.Generate()
+        fb = FrameBuffer(Pixmap.Format.RGB888,640,360,false)
+        fb?.colorBufferTexture?.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Nearest)
+        fbtr = TextureRegion(fb?.colorBufferTexture)
+        fbtr?.flip(false,true)
+        var cam = OrthographicCamera()
+        cam.setToOrtho(false,640f,360f)
+        cam.update()
+        mav?.batch?.projectionMatrix = cam.projection
     }
 
 
     override fun render() {
-        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         val deltatime = Gdx.graphics.deltaTime
+        statetime += deltatime
+        if (statetime > 4) {
+            System.out.println("${Gdx.graphics.framesPerSecond} FPS")
+            statetime -= 4f
+        }
+
+        fb?.begin()
+        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        mav?.batch?.begin()
+        mav?.drawString("hullo",0f,0f)
+        mav?.frame?.get("girl")?.draw(mav?.batch!!,pal,bigpal,Math.sin(statetime*Math.PI/2).toFloat()*32f,Math.cos(statetime*Math.PI/2).toFloat()*32f)
+        mav?.batch?.end()
+        fb?.end()
+        mav?.batch?.begin()
+        mav?.batch?.draw(fbtr,-320f,-180f)
+        mav?.batch?.end()
 
         //game logic
 //        oops.step(deltatime)
@@ -92,17 +129,17 @@ class ShootyShoot : ApplicationAdapter() {
 //        mav.newSFX("dash", "sfx/dash.wav")
 //        mav.newSFX("growl", "sfx/growl.wav")
 //
-//        val generator = FreeTypeFontGenerator(Gdx.files.internal("gfx/libmono.ttf"))
-//        val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
-//        parameter.size = 14 * 6
-//        parameter.genMipMaps = true
-//        parameter.magFilter = Texture.TextureFilter.Nearest
-//        parameter.minFilter = Texture.TextureFilter.Linear
-//        //parameter.characters = parameter.characters + "▄■";
-//        parameter.hinting = Hinting.Full
-//        mav.setFont(generator.generateFont(parameter), parameter.characters)
-//        mav.fontSampling = 6f
-//        generator.dispose()
+        val generator = FreeTypeFontGenerator(Gdx.files.internal("gfx/libmono.ttf"))
+        val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
+        parameter.size = 14 * 1
+        parameter.genMipMaps = true
+        parameter.magFilter = Texture.TextureFilter.Nearest
+        parameter.minFilter = Texture.TextureFilter.Linear
+        //parameter.characters = parameter.characters + "▄■";
+        parameter.hinting = FreeTypeFontGenerator.Hinting.Full
+        mav?.setFont(generator.generateFont(parameter), parameter.characters)
+        mav?.fontSampling = 1f
+        generator.dispose()
 //
 //        mav.newImage("sprites", "gfx/sprites.png", 16, 16)
 //
