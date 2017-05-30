@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Array
  * Created by joshm on 5/20/2017.
  */
 
-class TileFrame (
+class FramePal(
         var Name: String = "",
         var Image: String = "",
         var x: Int = 0,
@@ -20,12 +20,11 @@ class TileFrame (
         var HFlip: Boolean = false,
         var VFlip: Boolean = false,
         var Rot90: Int = 0) {
-    //input
 
     //generated
     var Tile = HashMap<Short, Sprite>()
 
-    fun Generate(map: Map<String,TexGrid>) {
+    fun Generate(map: Map<String, ImagePal>) {
         var tex = map[Image]
         if (tex != null) for (t in tex.Tex) {
             var l = t.value
@@ -37,15 +36,16 @@ class TileFrame (
         }
     }
 
-    fun draw(batch: Batch, pal: Array<Short>, bigpal: Array<Color>, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null) {
-        for (i in 0..pal.size-1) {
+    fun draw(batch: Batch, palette: Array<Color>, indecies: Array<Short>, indexoffset: Short, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null) {
+        for (i in 0..indecies.size-1) {
             var spr = Tile[i.toShort()]
-            var j = pal[i]
-            if (spr != null && j != null) {
-                var col = bigpal[j.toInt()]
+            var j = indecies[i] + indexoffset
+            if (spr != null && j in 0..palette.size-1) {
+                var col = palette.get(j)
                 if (col != null && col.a > 0) {
                     var s = Sprite(spr)
                     if (center != null) s.setOrigin(center.x, center.y)
+                    else s.setOriginCenter()
                     s.translate(x, y)
                     s.setScale(sw, sh)
                     s.rotate(rot)

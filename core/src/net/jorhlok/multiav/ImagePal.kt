@@ -8,11 +8,11 @@ import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap
 /**
  * Created by joshm on 5/19/2017.
  */
-class TexGrid (
-    val Name: String = "",
-    val URI: String = "",
-    val TWidth: Int = 1,
-    val THeight:Int = 1) {
+class ImagePal(
+    var Name: String = "",
+    var URI: String = "",
+    var TWidth: Int = 1,
+    var THeight:Int = 1) {
 
     var Tex = HashMap<Short, Texture>()
 

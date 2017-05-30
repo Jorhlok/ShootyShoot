@@ -1,7 +1,9 @@
 package net.jorhlok.multiav
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Array
 import java.util.HashMap
 
 /**
@@ -9,41 +11,35 @@ import java.util.HashMap
  * @author Jorhlok
  */
 class MultiAVRegister {
-    protected var image: MutableMap<String, TexGrid>
-    var frame = HashMap<String, TileFrame>()
-    protected var jAnim: MutableMap<String, jAnimSeq>
-    protected var Letters: MutableMap<Char, TextureRegion>
-    protected var SFX: MutableMap<String, SEffect>
-    protected var Mus: MutableMap<String, MTrack>
-    protected var Font: BitmapFont? = null //assumes monospace font
-    protected var DrawableChars: String? = null
+    //indexed gfx
+    private var imagePal = HashMap<String, ImagePal>()
+    private var framePal = HashMap<String, FramePal>()
+    private var sequencePal = HashMap<String, SequencePal>()
 
+    private var Letters = HashMap<Char, TextureRegion>()
+    private var SFX = HashMap<String, SEffect>()
+    private var Mus = HashMap<String, MTrack>()
+    private var Font: BitmapFont? = null //assumes monospace font
+    private var DrawableChars: String? = null
+
+    var palette = Array<Color>()
     var batch: Batch? = null
     var scale = Vector2(1f,1f)
     var camPos = Vector2(0f,0f)
     var tabLength = 4f
     var fontSampling = 1f
 
-    init {
-        image = HashMap<String, TexGrid>()
-//        frame = HashMap<String, TileFrame>()
-        jAnim = HashMap<String, jAnimSeq>()
-        Letters = HashMap<Char, TextureRegion>()
-        SFX = HashMap<String, SEffect>()
-        Mus = HashMap<String, MTrack>()
+    fun newImagePal(key: String, uri: String, tw: Int, th: Int) {
+        imagePal[key]?.dispose()
+        imagePal.put(key, ImagePal(key, uri, tw, th))
     }
 
-    fun newImage(key: String, uri: String, tw: Int, th: Int) {
-        image[key]?.dispose()
-        image.put(key, TexGrid(key, uri, tw, th))
+    fun newSpritePal(key: String, img: String, tx: Int, ty: Int, tw: Int = 1, th: Int = 1, hf: Boolean = false, vf: Boolean = false, rot90: Int = 0) {
+        framePal.put(key, FramePal(key, img, tx, ty, tw, th, hf, vf, rot90))
     }
 
-    fun newSprite(key: String, img: String, tx: Int, ty: Int, tw: Int = 1, th: Int = 1, hf: Boolean = false, vf: Boolean = false, rot90: Int = 0) {
-        frame.put(key, TileFrame(key, img, tx, ty, tw, th, hf, vf, rot90))
-    }
-
-    fun newAnim(key: String, frames: Array<String>, speed: Float, mode: Animation.PlayMode?) {
-        jAnim.put(key, jAnimSeq(key, frames, speed, mode))
+    fun newAnimPal(key: String, frames: Array<String>, palseq: Array<Array<Short>?> = Array<Array<Short>?>(), speed: Float = 0f, mode: Animation.PlayMode = Animation.PlayMode.LOOP) {
+        sequencePal.put(key, SequencePal(key, frames, palseq, speed, mode))
     }
 
     fun setFont(f: BitmapFont, chars: String) {
@@ -72,14 +68,24 @@ class MultiAVRegister {
 
     fun Generate() {
         batch = SpriteBatch()
-        for (t in image.values)
+        for (t in imagePal.values)
             t.Generate()
-        for (s in frame.values) {
-            s.Generate(image)
-            newAnim("_" + s.Name, arrayOf(s.Name), 0f, null) //auto generate single frame animation for each frame
+        for (s in framePal) {
+            s.value.Generate(imagePal)
+            val arr = Array<String>()
+            arr.add(s.key)
+
+            val defaultpal = Array<Array<Short>?>()
+            defaultpal.add(Array<Short>())
+            var maxi: Short = 0
+            for (k in s.value.Tile.keys) if (k > maxi) maxi = k
+            for (i in 0..maxi) defaultpal[0]!!.add(i.toShort())
+
+            newAnimPal("_" + s.key, arr, defaultpal) //auto generate single framePal animation for each framePal
         }
-        for (a in jAnim.values)
-//            a.Generate(frame)
+        for (a in sequencePal.values)
+            a.Generate(framePal)
+
         if (Font != null && DrawableChars != null && !DrawableChars!!.isEmpty()) {
             val dat = Font!!.data
             for (i in 0..DrawableChars!!.length - 1) {
@@ -100,20 +106,8 @@ class MultiAVRegister {
 
     }
 
-    @JvmOverloads fun draw(anim: String, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f) {
-        var x = x
-        var y = y
-        try {
-            val reg = jAnim[anim]?.getKeyFrame(statetime)
-            if (reg != null) {
-                x += (reg.regionHeight.toDouble() * scale.y.toDouble() * sh.toDouble() * Math.sin(Math.toRadians((-1 * rot).toDouble()))).toFloat()
-                y += (reg.regionHeight.toDouble() * scale.y.toDouble() * sh.toDouble() * Math.cos(Math.toRadians((-1 * rot).toDouble()))).toFloat()
-                drawRegion(reg, x, y, sw, sh, rot)
-            }
-        } catch (e: Exception) {
-            //nothing
-        }
-
+    fun drawPal(anim: String, indexoffset: Short, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null) {
+        if (batch != null) sequencePal[anim]?.draw(batch!!,palette,indexoffset,statetime,x,y,sw,sh,rot,center)
     }
 
     @JvmOverloads fun drawString(str: String, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f) {
@@ -190,11 +184,11 @@ class MultiAVRegister {
     fun dispose() {
         Font?.dispose()
         batch?.dispose()
-        for (t in image.values)
+        for (t in imagePal.values)
             t.dispose()
-        for (s in frame.values)
+        for (s in framePal.values)
             s.dispose()
-        for (a in jAnim.values)
+        for (a in sequencePal.values)
             a.dispose()
         for (s in SFX.values)
             s.dispose()
