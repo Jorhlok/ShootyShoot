@@ -1,7 +1,7 @@
 package net.jorhlok.shootyshoot;
 
 import com.badlogic.gdx.math.Vector2;
-import net.jorhlok.multiav.MultiAVRegister;
+import net.jorhlok.multiav.MultiGfxRegister;
 import net.jorhlok.oops.Physical;
 import net.jorhlok.oops.Postage;
 import net.jorhlok.oops.TMPCO;
@@ -69,7 +69,7 @@ public class TestPlatformer extends Physical {
     }
     
     @Override
-    public void draw(MultiAVRegister mav) {
+    public void draw(MultiGfxRegister mav) {
         mav.drawRgb("_gunrt", 0f, (Position.x+0.75f)*16, Position.y*16,1,1,0,new Vector2(),null);
         mav.drawRgb("_guyrt", 0f, Position.x*16, Position.y*16,1,1,0,new Vector2(),null);
     }

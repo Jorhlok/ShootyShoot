@@ -3,7 +3,7 @@ package net.jorhlok.oops;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import java.util.HashMap;
 import java.util.Map;
-import net.jorhlok.multiav.MultiAVRegister;
+import net.jorhlok.multiav.MultiGfxRegister;
 
 /**
  * Object Oriented Gameplay Setup
@@ -18,7 +18,7 @@ public class ObjectOrientedPlaySet {
     public Map<String,DungeonMaster> MasterScript = new HashMap<String,DungeonMaster>();
     
     //runtime
-    public MultiAVRegister MAV;
+    public MultiGfxRegister MAV;
     public DungeonMaster Here = null;
     
     public void addTileMap(String key, TiledMap map) {
@@ -34,7 +34,7 @@ public class ObjectOrientedPlaySet {
         MasterScript.put(key, script);
     }
     
-    public void setMAV(MultiAVRegister mav) {
+    public void setMAV(MultiGfxRegister mav) {
         MAV = mav;
     }
     

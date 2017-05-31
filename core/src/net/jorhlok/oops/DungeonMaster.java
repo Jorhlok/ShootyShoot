@@ -1,12 +1,10 @@
 package net.jorhlok.oops;
 
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -15,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import net.jorhlok.multiav.MultiAVRegister;
+import net.jorhlok.multiav.MultiGfxRegister;
 
 /**
  * The master script in a room.
@@ -95,7 +93,7 @@ public class DungeonMaster {
         
     }
     
-    public void draw(float deltatime, MultiAVRegister msr) {
+    public void draw(float deltatime, MultiGfxRegister msr) {
         
     }
     

@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import java.util.Map;
-import net.jorhlok.multiav.MultiAVRegister;
+import net.jorhlok.multiav.MultiGfxRegister;
 import net.jorhlok.oops.DungeonMaster;
 import net.jorhlok.oops.Entity;
 import net.jorhlok.oops.Postage;
@@ -70,7 +70,7 @@ public class TestDM extends DungeonMaster {
     }
     
     @Override
-    public void draw(float deltatime, MultiAVRegister msr) {
+    public void draw(float deltatime, MultiGfxRegister msr) {
         render.render();
         msr.getBatch().begin();
         try {

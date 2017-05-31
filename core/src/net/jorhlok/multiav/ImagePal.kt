@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap
+import com.badlogic.gdx.graphics.g2d.PixmapPacker
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 
 /**
  * Created by joshm on 5/19/2017.
@@ -14,7 +17,8 @@ class ImagePal(
     var TWidth: Int = 1,
     var THeight:Int = 1) {
 
-    var Tex = HashMap<Short, Texture>()
+    var Atlas: TextureAtlas? = null
+    var Tex = HashMap<Short, TextureRegion>()
 
     fun Generate(maxIndex:Int = 4096) {
         val maxVal = if (maxIndex in 1..4096) maxIndex else 4096
@@ -54,16 +58,26 @@ class ImagePal(
 
             p.drawPixel(i%pix.width, i/pix.width)
         }
-        pix.dispose()
 
+        val wh = maxOf(pix.width,pix.height,512)
+        pix.dispose()
+        var pack = PixmapPacker(wh,wh,Pixmap.Format.LuminanceAlpha,2,false)
         for (p in layers) {
-            Tex[p.key] = Texture(p.value)
+            pack.pack(p.key.toString(16),p.value)
+        }
+
+        dispose()
+        Atlas = pack.generateTextureAtlas(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest,false)
+        pack.dispose()
+        if (Atlas != null) for (p in layers) {
+            Tex[p.key] = Atlas!!.findRegion(p.key.toString(16))
             p.value.dispose()
         }
     }
 
     fun dispose() {
-        for (t in Tex) t.value.dispose()
+        Atlas?.dispose()
+        Tex = HashMap<Short, TextureRegion>()
     }
 
 }

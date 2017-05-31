@@ -11,14 +11,14 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
-import net.jorhlok.multiav.MultiAVRegister
+import net.jorhlok.multiav.MultiGfxRegister
 import net.jorhlok.oops.ObjectOrientedPlaySet
 
 
 class ShootyShoot : ApplicationAdapter() {
 //    private val camera = OrthographicCamera()
 //    private val campos = Vector2()
-    private var mav: MultiAVRegister? = null
+    private var mav: MultiGfxRegister? = null
     private var oops: ObjectOrientedPlaySet? = null
     var fb: FrameBuffer? = null
     var fbtr: TextureRegion? = null
@@ -35,7 +35,7 @@ class ShootyShoot : ApplicationAdapter() {
         bigpal.add(Color(0f,0f,0f,1f))
         bigpal.add(Color(4/15f,12/15f,2/15f,1f))
         bigpal.add(Color(13/15f,13/15f,13/15f,1f))
-        mav = MultiAVRegister()
+        mav = MultiGfxRegister()
         mav!!.palette = bigpal
         mkav()
         mav!!.Generate()
@@ -97,7 +97,8 @@ class ShootyShoot : ApplicationAdapter() {
         mav!!.drawPal("_girl",4,0f,72f,72f,2f,2f,statetime*90, Vector2())
         mav!!.drawPal("_girl",0,0f,8f,8f,2f,2f,statetime*90)
         mav!!.drawPal("_girl",0,0f,40f,40f,2f,2f,statetime*90)
-        mav!!.drawRgb("pacrt",statetime,300f,300f)
+        mav!!.drawString("libmono","wubba lubba dub dub",320f,180f)
+        mav!!.drawRgb("pacrt",statetime,320f,180f,1f,1f,0f,Vector2())
         mav!!.batch!!.end()
         fb!!.end()
         mav!!.batch!!.begin()
@@ -142,8 +143,9 @@ class ShootyShoot : ApplicationAdapter() {
         parameter.minFilter = Texture.TextureFilter.Linear
         //parameter.characters = parameter.characters + "▄■";
         parameter.hinting = FreeTypeFontGenerator.Hinting.Full
-        mav?.setFont(generator.generateFont(parameter), parameter.characters)
-        mav?.fontSampling = 1f
+        mav?.newFont("libmono",generator.generateFont(parameter))
+//        mav?.setFont(generator.generateFont(parameter), parameter.characters)
+//        mav?.fontSampling = 1f
         generator.dispose()
 
         mav?.newImageRgb("sprites", "gfx/sprites.png", 16, 16)

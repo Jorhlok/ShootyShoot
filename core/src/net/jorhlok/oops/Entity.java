@@ -2,7 +2,7 @@ package net.jorhlok.oops;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import net.jorhlok.multiav.MultiAVRegister;
+import net.jorhlok.multiav.MultiGfxRegister;
 
 /**
  * Some sort of entity. May or may not exist in worldspace.
@@ -25,5 +25,5 @@ public class Entity {
     public void prestep(float deltatime) {}
     public void step(float deltatime) {}
     public void poststep(float deltatime) {}
-    public void draw(MultiAVRegister mav) {}
+    public void draw(MultiGfxRegister mav) {}
 }
