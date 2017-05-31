@@ -31,7 +31,6 @@ class FramePal(
             var s = Sprite(l, x*tex.TWidth, y*tex.THeight, width*tex.TWidth, height*tex.THeight)
             s.setFlip(HFlip,VFlip)
             for (i in 0..Rot90-1) s.rotate90(false)
-            s.setOriginCenter() //default in the center
             Tile[t.key] = s
         }
     }

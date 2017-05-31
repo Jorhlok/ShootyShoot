@@ -70,8 +70,8 @@ public class TestPlatformer extends Physical {
     
     @Override
     public void draw(MultiAVRegister mav) {
-//        mav.drawPal("_gunrt", 0, Position.x+0.75f, Position.y);
-//        mav.drawPal("_guyrt", 0, Position.x, Position.y);
+        mav.drawRgb("_gunrt", 0f, (Position.x+0.75f)*16, Position.y*16,1,1,0,new Vector2(),null);
+        mav.drawRgb("_guyrt", 0f, Position.x*16, Position.y*16,1,1,0,new Vector2(),null);
     }
     
     

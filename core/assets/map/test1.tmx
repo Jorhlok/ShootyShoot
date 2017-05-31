@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="16" tileheight="16" nextobjectid="1">
- <tileset firstgid="1" name="sprites" tilewidth="16" tileheight="16" tilecount="256">
-  <imagePal source="../gfx/sprites.png" width="256" height="256"/>
- </tileset>
+<map version="1.0.0" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="16" tileheight="16" nextobjectid="1">
+ <tileset firstgid="1" source="test1.tsx"/>
  <layer name="Terrain" width="32" height="32">
   <data encoding="base64" compression="zlib">
    eJz7yMDA8HGA8UCBUftH7R+1f9T+UftH7R+1f3DbT4u2w1DyP73sp2e7bDD6f7DaP9zS/0C2/z8i0fS2/yMam1pxSIxZuPI6PQA2e+hZzuASp7X9+Mwf6H43CAMAdzmNNw==

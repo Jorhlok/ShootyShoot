@@ -20,7 +20,7 @@ public class TestDM extends DungeonMaster {
     
     @Override
     public void begin() {
-        render = new OrthogonalTiledMapRenderer(Level,1/16f,Parent.MAV.getBatch());
+        render = new OrthogonalTiledMapRenderer(Level,1f,Parent.MAV.getBatch());
         render.setView(cam);
         
         Entity e = mkEntity("testplat","player","player");
@@ -79,6 +79,7 @@ public class TestDM extends DungeonMaster {
             }
         } catch (Exception e) {
             //meh
+            e.printStackTrace();
         }
         msr.getBatch().end();
     }

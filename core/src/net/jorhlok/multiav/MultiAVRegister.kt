@@ -16,6 +16,11 @@ class MultiAVRegister {
     private var framePal = HashMap<String, FramePal>()
     private var sequencePal = HashMap<String, SequencePal>()
 
+    //rgb gfx
+    private var imageRgb = HashMap<String, ImageRgb>()
+    private var frameRgb = HashMap<String, FrameRgb>()
+    private var sequenceRgb = HashMap<String, SequenceRgb>()
+
     private var Letters = HashMap<Char, TextureRegion>()
     private var SFX = HashMap<String, SEffect>()
     private var Mus = HashMap<String, MTrack>()
@@ -40,6 +45,19 @@ class MultiAVRegister {
 
     fun newAnimPal(key: String, frames: Array<String>, palseq: Array<Array<Short>?> = Array<Array<Short>?>(), speed: Float = 0f, mode: Animation.PlayMode = Animation.PlayMode.LOOP) {
         sequencePal.put(key, SequencePal(key, frames, palseq, speed, mode))
+    }
+
+    fun newImageRgb(key: String, uri: String, tw: Int, th: Int) {
+        imageRgb[key]?.dispose()
+        imageRgb.put(key, ImageRgb(key, uri, tw, th))
+    }
+
+    fun newSpriteRgb(key: String, img: String, tx: Int, ty: Int, tw: Int = 1, th: Int = 1, hf: Boolean = false, vf: Boolean = false, rot90: Int = 0) {
+        frameRgb.put(key, FrameRgb(key, img, tx, ty, tw, th, hf, vf, rot90))
+    }
+
+    fun newAnimRgb(key: String, frames: Array<String>, speed: Float = 0f, mode: Animation.PlayMode = Animation.PlayMode.LOOP) {
+        sequenceRgb.put(key, SequenceRgb(key, frames, speed, mode))
     }
 
     fun setFont(f: BitmapFont, chars: String) {
@@ -72,19 +90,24 @@ class MultiAVRegister {
             t.Generate()
         for (s in framePal) {
             s.value.Generate(imagePal)
-            val arr = Array<String>()
-            arr.add(s.key)
-
-            val defaultpal = Array<Array<Short>?>()
-            defaultpal.add(Array<Short>())
+            val defaultpal = Array<Array<Short>?>(arrayOf(Array<Short>()))
             var maxi: Short = 0
             for (k in s.value.Tile.keys) if (k > maxi) maxi = k
             for (i in 0..maxi) defaultpal[0]!!.add(i.toShort())
 
-            newAnimPal("_" + s.key, arr, defaultpal) //auto generate single framePal animation for each framePal
+            newAnimPal("_" + s.key, Array<String>(arrayOf(s.key)), defaultpal) //auto generate single frame animation for each framePal
         }
         for (a in sequencePal.values)
             a.Generate(framePal)
+
+        for (t in imageRgb.values)
+            t.Generate()
+        for (s in frameRgb) {
+            s.value.Generate(imageRgb)
+            newAnimRgb("_" + s.key, Array<String>(arrayOf(s.key))) //auto generate single frame animation for each frameRgb
+        }
+        for (a in sequenceRgb.values)
+            a.Generate(frameRgb)
 
         if (Font != null && DrawableChars != null && !DrawableChars!!.isEmpty()) {
             val dat = Font!!.data
@@ -108,6 +131,10 @@ class MultiAVRegister {
 
     fun drawPal(anim: String, indexoffset: Short, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null) {
         if (batch != null) sequencePal[anim]?.draw(batch!!,palette,indexoffset,statetime,x,y,sw,sh,rot,center)
+    }
+
+    fun drawRgb(anim: String, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color? = null) {
+        if (batch != null) sequenceRgb[anim]?.draw(batch!!,statetime,x,y,sw,sh,rot,center, col)
     }
 
     @JvmOverloads fun drawString(str: String, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f) {
@@ -189,6 +216,12 @@ class MultiAVRegister {
         for (s in framePal.values)
             s.dispose()
         for (a in sequencePal.values)
+            a.dispose()
+        for (t in imageRgb.values)
+            t.dispose()
+        for (s in frameRgb.values)
+            s.dispose()
+        for (a in sequenceRgb.values)
             a.dispose()
         for (s in SFX.values)
             s.dispose()
