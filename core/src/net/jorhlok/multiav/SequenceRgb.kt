@@ -33,7 +33,7 @@ class SequenceRgb (
         }
     }
 
-    fun draw(batch: Batch, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color? = null) {
+    fun draw(batch: Batch, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color = Color(1f,1f,1f,1f)) {
         if (Seq != null) {
             val frame = Seq!!.getKeyFrame(statetime)
             frame.draw(batch, x, y, sw, sh, rot, center, col)

@@ -26,6 +26,7 @@ class MultiGfxRegister {
 
     //bitmap fonts
     private var fonts = HashMap<String, BitmapFont>()
+    private var fontsampling = HashMap<String, Float>()
 
     //shape gfx
 
@@ -76,8 +77,9 @@ class MultiGfxRegister {
         sequenceRgb.put(key, SequenceRgb(key, frames, speed, mode))
     }
 
-    fun newFont(key: String, f: BitmapFont) {
+    fun newFont(key: String, f: BitmapFont, sampling: Float = 1f) {
         fonts.put(key,f)
+        fontsampling.put(key,sampling)
     }
 
 //    fun setFont(f: BitmapFont, chars: String) {
@@ -155,86 +157,52 @@ class MultiGfxRegister {
         if (batch != null) sequencePal[anim]?.draw(batch!!,palette,indexoffset,statetime,x,y,sw,sh,rot,center)
     }
 
-    fun drawRgb(anim: String, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color? = null) {
+    fun drawRgb(anim: String, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color = Color(1f,1f,1f,1f)) {
         if (batch != null) sequenceRgb[anim]?.draw(batch!!,statetime,x,y,sw,sh,rot,center, col)
     }
 
-    fun drawString(f: String, str: String, x: Float, y: Float, center: Vector2? = null, col: Color? = null) {
-        var font = fonts[f]
-        if (font != null) {
-            if (center != null && center.x == 0f && center.y == 0f) {
-                if (col != null) batch?.color = col
-                font.draw(batch,str,x,y)
-            }
-            else {
-                var lay = GlyphLayout(font,str)
-                var pos = Vector2()
-                if (center == null) {
-                    pos.x = lay.width/2
-                    pos.y = lay.height
-                } else {
-                    pos.x = lay.width*center.x
-                    pos.y = lay.height*center.y*2
+    fun drawString(f: String, str: String, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2(0.5f,0.5f), col: Color = Color(1f,1f,1f,1f)) {
+        drawGlyphLayout(f,stringLayout(f,str),x,y,sw,sh,rot,center,col)
+    }
+
+    fun drawGlyphLayout(font: String, lay: GlyphLayout, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2(0.5f,0.5f), col: Color = Color(1f,1f,1f,1f)) {
+        val f = fonts[font]
+        val sampling = fontsampling[font]
+        if (f != null && sampling!= null && batch != null) {
+            val begin = Vector2(x-lay.width*center.x,y+f.lineHeight+lay.height*center.y)
+            val pages = f.regions
+            val oldcol = batch!!.color
+            batch!!.color = col
+            for (run in lay.runs) {
+                var xadv = 0f
+                for (i in 0..run.glyphs.size-1) {
+                    val g = run.glyphs[i]
+                    xadv += run.xAdvances[i]
+                    val pt = transformPoint(Vector2(run.x+xadv+g.xoffset,run.y+g.yoffset).add(begin),sw*sampling,sh*sampling,rot,Vector2(x,y))
+                    batch!!.draw(TextureRegion(pages[g.page],g.srcX,g.srcY,g.width,g.height),
+                            pt.x,pt.y,0f,0f,g.width.toFloat(),g.height.toFloat(),sw*sampling,sh*sampling,rot)
+
                 }
-                if (col != null) batch?.color = col
-                font.draw(batch,lay,x-pos.x,y+pos.y)
             }
+            batch!!.color = oldcol
         }
     }
 
-    fun drawStringExt(f: String, str: String, x: Float, y: Float, center: Vector2? = null, col: Color? = null, targetWidth: Float, halign: Int, wrap: Boolean) {
-//        fonts[f]
+    fun transformPoint(pt: Vector2, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2()): Vector2 {
+        return pt.cpy().sub(center).scl(sw,sh).rotate(rot).add(center)
     }
 
-    fun drawStringFb(f: String, str: String, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color? = null) {
-//        fonts[f]
+    fun stringLayout(font: String, str: String): GlyphLayout {
+        var f = fonts[font]
+        if (f != null) return GlyphLayout(f,str)
+        return GlyphLayout()
     }
 
-    fun drawStringFbExt(f: String, str: String, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color? = null, targetWidth: Float, halign: Int, wrap: Boolean) {
-//        fonts[f]
+    fun stringLayout(font: String, str: String, col: Color, targetWidth: Float, halign: Int, wrap: Boolean): GlyphLayout {
+        var f = fonts[font]
+        if (f != null) return GlyphLayout(f,str,col,targetWidth,halign,wrap)
+        return GlyphLayout()
     }
-
-//    @JvmOverloads fun drawString(str: String, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f) {
-//        var x = x
-//        var y = y
-//        x /= 2f
-//        y /= 2f
-//        val w = Font!!.spaceWidth
-//        val h = Font!!.lineHeight
-//        x += (h.toDouble() * scale.y.toDouble() * sh.toDouble() * 0.5 * Math.sin(Math.toRadians((-1 * rot).toDouble())) / fontSampling).toFloat()
-//        y += (h.toDouble() * scale.y.toDouble() * sh.toDouble() * 0.5 * Math.cos(Math.toRadians((-1 * rot).toDouble())) / fontSampling).toFloat()
-//        val xtrav = w.toDouble() * Math.cos(Math.toRadians(rot.toDouble())) * sw.toDouble() * scale.x.toDouble() / fontSampling
-//        val ytrav = w.toDouble() * Math.sin(Math.toRadians(rot.toDouble())) * sw.toDouble() * scale.y.toDouble() / fontSampling
-//        val xjmp = h.toDouble() * Math.sin(Math.toRadians(rot.toDouble())) * sh.toDouble() * scale.x.toDouble() / fontSampling
-//        val yjmp = h.toDouble() * Math.cos(Math.toRadians(rot.toDouble())) * sh.toDouble() * scale.y.toDouble() / fontSampling
-//
-//        var xcur = x.toDouble()
-//        var ycur = y.toDouble()
-//        var linesdown = 0
-//        for (i in 0..str.length - 1) {
-//            val c = str[i]
-//            when (c) {
-//                '\n' -> {
-//                    ++linesdown
-//                    xcur = x + xjmp * linesdown
-//                    ycur = y - yjmp * linesdown
-//                }
-//                '\t' -> {
-//                    xcur += xtrav * tabLength
-//                    ycur += ytrav * tabLength
-//                }
-//                else -> {
-//                    val reg = Letters[c]
-//                    val xoff = (Font!!.data.getGlyph(c).xoffset / w).toDouble()
-//                    val yoff = (Font!!.data.getGlyph(c).yoffset / h).toDouble()
-//                    if (reg != null)
-//                        drawRegion(reg, x + (xcur + xoff * xtrav - yoff * xjmp).toFloat(), y + (ycur + xoff * ytrav + yoff * yjmp).toFloat(), sw / fontSampling, sh * -1 / fontSampling, rot)
-//                    xcur += xtrav
-//                    ycur += ytrav
-//                }
-//            }
-//        }
-//    }
 
 //    fun getSFX(key: String): SEffect? {
 //        return SFX[key]

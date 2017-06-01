@@ -97,8 +97,9 @@ class ShootyShoot : ApplicationAdapter() {
         mav!!.drawPal("_girl",4,0f,72f,72f,2f,2f,statetime*90, Vector2())
         mav!!.drawPal("_girl",0,0f,8f,8f,2f,2f,statetime*90)
         mav!!.drawPal("_girl",0,0f,40f,40f,2f,2f,statetime*90)
-        mav!!.drawString("libmono","wubba lubba dub dub",320f,180f)
-        mav!!.drawRgb("pacrt",statetime,320f,180f,1f,1f,0f,Vector2())
+        mav!!.drawString("libmono","wubba lubba dub dub",Math.round(Math.sin(statetime*Math.PI/2)*64f+320f).toFloat(),Math.round(Math.cos(statetime*Math.PI/2)*64f+180f).toFloat(),1f,1f,0f,Vector2(0.5f,0.5f),mav!!.palette[2])
+        mav!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f),mav!!.palette[2])
+        mav!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
         mav!!.batch!!.end()
         fb!!.end()
         mav!!.batch!!.begin()
@@ -137,13 +138,12 @@ class ShootyShoot : ApplicationAdapter() {
         val generator = FreeTypeFontGenerator(Gdx.files.internal("gfx/libmono.ttf"))
         val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
         parameter.size = 14 * 1
-        parameter.kerning = true
-        parameter.genMipMaps = true
-        parameter.magFilter = Texture.TextureFilter.Nearest
+//        parameter.genMipMaps = true
+        parameter.magFilter = Texture.TextureFilter.Linear
         parameter.minFilter = Texture.TextureFilter.Linear
         //parameter.characters = parameter.characters + "▄■";
         parameter.hinting = FreeTypeFontGenerator.Hinting.Full
-        mav?.newFont("libmono",generator.generateFont(parameter))
+        mav?.newFont("libmono",generator.generateFont(parameter),1f)
 //        mav?.setFont(generator.generateFont(parameter), parameter.characters)
 //        mav?.fontSampling = 1f
         generator.dispose()

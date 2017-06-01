@@ -32,14 +32,14 @@ class FrameRgb(
         }
     }
 
-    fun draw(batch: Batch, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color? = null) {
+    fun draw(batch: Batch, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color = Color(1f,1f,1f,1f)) {
         var s = Sprite(Tile)
         if (center != null) s.setOrigin(center.x, center.y)
         else s.setOriginCenter()
         s.translate(x, y)
         s.setScale(sw, sh)
         s.rotate(rot)
-        if (col != null) s.color = col
+        s.color = col
         try {
             s.draw(batch)
         } catch (e: Exception) {/*oh, well*/}
