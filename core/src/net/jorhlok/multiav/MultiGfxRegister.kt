@@ -245,11 +245,13 @@ class MultiGfxRegister {
 
     fun fillShapes() {
         shapetype = ShapeRenderer.ShapeType.Filled
+        drawingShape()
         shape?.set(shapetype)
     }
 
     fun lineShapes() {
         shapetype = ShapeRenderer.ShapeType.Line
+        drawingShape()
         shape?.set(shapetype)
     }
 

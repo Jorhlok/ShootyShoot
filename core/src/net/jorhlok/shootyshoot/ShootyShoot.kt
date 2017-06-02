@@ -65,6 +65,9 @@ class ShootyShoot : ApplicationAdapter() {
         mav!!.startBuffer("main")
         mav!!.clear(0.1f,0.1f,0.1f,1f)
 
+        mav!!.fillShapes()
+        mav!!.drawCircle(320f,180f,64f,Math.round(Math.sin(statetime*Math.PI/2).toFloat()*3+9),Color(0.2f,0.3f,1f,1f))
+
         //game logic
         oops!!.step(deltatime)
         try {
@@ -80,8 +83,6 @@ class ShootyShoot : ApplicationAdapter() {
         mav!!.drawString("libmono","wubba lubba dub dub",Math.round(Math.sin(statetime*Math.PI/2)*64f+320f).toFloat(),Math.round(Math.cos(statetime*Math.PI/2)*64f+180f).toFloat(),1f,1f,0f,Vector2(0.5f,0.5f),mav!!.palette[2])
         mav!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f),mav!!.palette[2])
         mav!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
-
-        mav!!.drawCircle(320f,180f,64f,Math.round(Math.sin(statetime*Math.PI/2).toFloat()*3+9),mav!!.palette[2])
 
         mav!!.stopBuffer()
         mav!!.clear()
