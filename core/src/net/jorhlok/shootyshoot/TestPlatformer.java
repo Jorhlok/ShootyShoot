@@ -16,7 +16,7 @@ public class TestPlatformer extends Physical {
     protected boolean right;
     
     public TestPlatformer() {
-        AABB.set(0,0,1,1);
+        AABB.set(0.125f,0,0.75f,1);
         Tolerance.set(0.5f, 0.5f);
         Position.set(5, 8);
         Gravity = new Vector2 (0, -10f);

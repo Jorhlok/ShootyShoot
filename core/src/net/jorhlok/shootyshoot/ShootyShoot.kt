@@ -5,9 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.Animation
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
@@ -83,14 +81,12 @@ class ShootyShoot : ApplicationAdapter() {
         mav!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f),mav!!.palette[2])
         mav!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
 
-        mav!!.drawingShape()
-        mav!!.shape?.color = Color(0f,0f,1f,1f)
-        mav!!.shape?.circle(320f,180f,100f,Math.round(statetime+5))
+        mav!!.drawCircle(320f,180f,64f,Math.round(Math.sin(statetime*Math.PI/2).toFloat()*3+9),mav!!.palette[2])
 
         mav!!.stopBuffer()
         mav!!.clear()
-        mav!!.drawBuffer("main",0f,0f,1f,1f,statetime*5-10,Vector2(320f,180f))
-        mav!!.drawingOff()
+        mav!!.drawBuffer("main",Math.sin(statetime*Math.PI/2).toFloat()*8f,0f)
+        mav!!.flush()
     }
 
 

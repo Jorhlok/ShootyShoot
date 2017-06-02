@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Array
 import java.util.HashMap
 
@@ -43,55 +45,13 @@ class MultiGfxRegister {
 //    private var Mus = HashMap<String, MTrack>()
 
     var batch: Batch? = null
-    var shape: ShapeRenderer? = null
-    var camera = OrthographicCamera()
-    var palette = Array<Color>()
+        get() = field
+    private var shape: ShapeRenderer? = null
+    private var shapetype: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Line
     private var status = DrawingState.off
 
-    fun drawingSprite() {
-        when (status) {
-            DrawingState.off -> {
-                batch?.begin()
-                status = DrawingState.sprite
-            }
-            DrawingState.shape -> {
-                shape?.flush()
-                shape?.end()
-                batch?.begin()
-                status = DrawingState.sprite
-            }
-        }
-    }
-
-    fun drawingShape() {
-        when (status) {
-            DrawingState.off -> {
-                shape?.begin()
-                status = DrawingState.shape
-            }
-            DrawingState.sprite -> {
-                batch?.flush()
-                batch?.end()
-                shape?.begin()
-                status = DrawingState.shape
-            }
-        }
-    }
-
-    fun drawingOff() {
-        when (status) {
-            DrawingState.sprite -> {
-                batch?.flush()
-                batch?.end()
-                status = DrawingState.off
-            }
-            DrawingState.shape -> {
-                shape?.flush()
-                shape?.end()
-                status = DrawingState.off
-            }
-        }
-    }
+    var camera = OrthographicCamera()
+    var palette = Array<Color>()
 
     fun newImagePal(key: String, uri: String, tw: Int, th: Int) {
         imagePal[key]?.dispose()
@@ -178,6 +138,54 @@ class MultiGfxRegister {
             a.Generate(frameRgb)
     }
 
+    private fun drawingSprite() {
+        when (status) {
+            DrawingState.off -> {
+                batch?.begin()
+                status = DrawingState.sprite
+            }
+            DrawingState.shape -> {
+                shape?.flush()
+                shape?.end()
+                batch?.begin()
+                status = DrawingState.sprite
+            }
+        }
+    }
+
+    private fun drawingShape() {
+        when (status) {
+            DrawingState.off -> {
+                shape?.begin(shapetype)
+                status = DrawingState.shape
+            }
+            DrawingState.sprite -> {
+                batch?.flush()
+                batch?.end()
+                shape?.begin(shapetype)
+                status = DrawingState.shape
+            }
+        }
+    }
+
+    private fun drawingOff() {
+        when (status) {
+            DrawingState.sprite -> {
+                batch?.flush()
+                batch?.end()
+                status = DrawingState.off
+            }
+            DrawingState.shape -> {
+                shape?.flush()
+                shape?.end()
+                status = DrawingState.off
+            }
+        }
+    }
+
+
+    //regular drawing
+
     fun drawPal(anim: String, indexoffset: Short, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null) {
         drawingSprite()
         if (batch != null) sequencePal[anim]?.draw(batch!!,palette,indexoffset,statetime,x,y,sw,sh,rot,center)
@@ -232,7 +240,216 @@ class MultiGfxRegister {
         return GlyphLayout()
     }
 
-    //TODO: put drawing shapes functions here
+
+    //draw vector graphics
+
+    fun fillShapes() {
+        shapetype = ShapeRenderer.ShapeType.Filled
+        shape?.set(shapetype)
+    }
+
+    fun lineShapes() {
+        shapetype = ShapeRenderer.ShapeType.Line
+        shape?.set(shapetype)
+    }
+
+    fun drawPoint(x: Float, y: Float, z: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.point(x,y,z)
+    }
+
+    fun drawLine(x: Float, y: Float, z: Float, x2: Float, y2: Float, z2: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.line(x,y,z,x2,y2,z2)
+    }
+
+    fun drawLine(v0: Vector3, v1: Vector3, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.line(v0,v1)
+    }
+
+    fun drawLine(x: Float, y: Float, x2: Float, y2: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.line(x,y,x2,y2)
+    }
+
+    fun drawLine(v0: Vector2, v1: Vector2, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.line(v0,v1)
+    }
+
+    fun drawLine(x: Float, y: Float, x2: Float, y2: Float, c1: Color, c2: Color) {
+        shape?.line(x,y,x2,y2,c1,c2)
+    }
+
+    fun drawLine(x: Float, y: Float, z: Float, x2: Float, y2: Float, z2: Float, c1: Color, c2: Color) {
+        shape?.line(x,y,z,x2,y2,z2,c1,c2)
+    }
+
+    fun drawCurve(x1: Float, y1: Float, cx1: Float, cy1: Float, cx2: Float, cy2: Float, x2: Float, y2: Float, segments: Int, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.curve(x1,y1,cx1,cy1,cx2,cy2,x2,y2,segments)
+    }
+
+    fun drawTriangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.triangle(x1,y1,x2,y2,x3,y3)
+    }
+
+    fun drawTriangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, col1: Color, col2: Color, col3: Color) {
+        shape?.triangle(x1,y1,x2,y2,x3,y3,col1,col2,col3)
+    }
+
+    fun drawRect(x: Float, y: Float, width: Float, height: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.rect(x,y,width,height)
+    }
+
+    fun drawRect(x: Float, y: Float, width: Float, height: Float, col1: Color, col2: Color, col3: Color, col4: Color) {
+        shape?.rect(x,y,width,height,col1,col2,col3,col4)
+    }
+
+    fun drawRect(x: Float, y: Float, originX: Float, originY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float,
+             degrees: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.rect(x,y,originX,originY,width,height,scaleX,scaleY,degrees)
+    }
+
+    fun drawRect(x: Float, y: Float, originX: Float, originY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float,
+             degrees: Float, col1: Color, col2: Color, col3: Color, col4: Color) {
+        shape?.rect(x,y,originX,originY,width,height,scaleX,scaleY,degrees,col1,col2,col3,col4)
+
+    }
+
+    fun drawRectLine(x1: Float, y1: Float, x2: Float, y2: Float, width: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.rectLine(x1,y1,x2,y2,width)
+    }
+
+    fun drawRectLine(x1: Float, y1: Float, x2: Float, y2: Float, width: Float, c1: Color, c2: Color) {
+        shape?.rectLine(x1,y1,x2,y2,width,c1,c2)
+    }
+
+    fun drawRectLine(p1: Vector2, p2: Vector2, width: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.rectLine(p1,p2,width)
+    }
+
+    fun drawBox(x: Float, y: Float, z: Float, width: Float, height: Float, depth: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.box(x,y,z,width,height,depth)
+    }
+
+    fun drawX(x: Float, y: Float, size: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.x(x,y,size)
+    }
+
+    fun drawX(p: Vector2, size: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.x(p,size)
+    }
+
+    fun drawArc(x: Float, y: Float, radius: Float, start: Float, degrees: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.arc(x,y,radius,start,degrees)
+    }
+
+    fun drawArc(x: Float, y: Float, radius: Float, start: Float, degrees: Float, segments: Int, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.arc(x,y,radius,start,degrees,segments)
+    }
+
+    fun drawCircle(x: Float, y: Float, radius: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.circle(x,y,radius)
+    }
+
+    fun drawCircle(x: Float, y: Float, radius: Float, segments: Int, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.circle(x,y,radius,segments)
+    }
+
+    fun drawEllipse(x: Float, y: Float, width: Float, height: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.ellipse(x,y,width,height)
+    }
+
+    fun drawEllipse(x: Float, y: Float, width: Float, height: Float, segments: Int, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.ellipse(x,y,width,height,segments)
+    }
+
+    fun drawEllipse(x: Float, y: Float, width: Float, height: Float, rotation: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.ellipse(x,y,width,height,rotation)
+    }
+
+    fun drawEllipse(x: Float, y: Float, width: Float, height: Float, rotation: Float, segments: Int, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.ellipse(x,y,width,height,rotation,segments)
+    }
+
+    fun drawCone(x: Float, y: Float, z: Float, radius: Float, height: Float, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.cone(x,y,z,radius,height)
+    }
+
+    fun drawCone(x: Float, y: Float, z: Float, radius: Float, height: Float, segments: Int, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.cone(x,y,z,radius,height,segments)
+    }
+
+    fun drawPolygon(vertices: FloatArray, offset: Int, count: Int, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.polygon(vertices,offset,count)
+    }
+
+    fun drawPolygon(vertices: FloatArray, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.polygon(vertices)
+    }
+
+    fun drawPolyline(vertices: FloatArray, offset: Int, count: Int, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.polyline(vertices,offset,count)
+    }
+
+    fun drawPolyline(vertices: FloatArray, col: Color? = null) {
+        drawingShape()
+        if (col != null) shape?.color = col
+        shape?.polyline(vertices)
+    }
+
+
+    //drawing framebuffers
 
     fun getBufCam(key: String): OrthographicCamera? {
         val buf = buffers[key]
@@ -251,6 +468,10 @@ class MultiGfxRegister {
 
     fun blank() {
         clear(0f,0f,0f,0f)
+    }
+
+    fun flush() {
+        drawingOff()
     }
 
     fun startBuffer(key: String) {
