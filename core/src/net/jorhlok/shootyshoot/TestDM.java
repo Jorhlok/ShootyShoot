@@ -72,7 +72,6 @@ public class TestDM extends DungeonMaster {
     @Override
     public void draw(float deltatime, MultiGfxRegister msr) {
         render.render();
-        msr.getBatch().begin();
         try {
             for ( Entity e : Living.get("player") ) {
                 e.draw(msr);
@@ -81,6 +80,5 @@ public class TestDM extends DungeonMaster {
             //meh
             e.printStackTrace();
         }
-        msr.getBatch().end();
     }
 }

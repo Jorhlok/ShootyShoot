@@ -16,12 +16,8 @@ import net.jorhlok.oops.ObjectOrientedPlaySet
 
 
 class ShootyShoot : ApplicationAdapter() {
-//    private val camera = OrthographicCamera()
-//    private val campos = Vector2()
     private var mav: MultiGfxRegister? = null
     private var oops: ObjectOrientedPlaySet? = null
-    var fb: FrameBuffer? = null
-    var fbtr: TextureRegion? = null
     var statetime = 0f
 
 
@@ -39,16 +35,8 @@ class ShootyShoot : ApplicationAdapter() {
         mav!!.palette = bigpal
         mkav()
         mav!!.Generate()
-        fb = FrameBuffer(Pixmap.Format.RGB888,640,360,false)
-        fb?.colorBufferTexture?.setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Nearest)
-        fbtr = TextureRegion(fb?.colorBufferTexture)
-        fbtr?.flip(false,true)
-        var cam = OrthographicCamera()
-        cam.setToOrtho(false,640f,360f)
-        cam.update()
-        mav?.batch?.projectionMatrix = cam.combined
-
-
+        mav!!.camera.setToOrtho(false,640f,360f)
+        mav!!.camera.update()
 
 //        mav.setMusVolume(0.5f)
 
@@ -59,7 +47,7 @@ class ShootyShoot : ApplicationAdapter() {
         oops!!.addEntityType("testplat", TestPlatformer::class.java)
 
         val dm = TestDM("test1", null)
-        dm.cam = cam
+        dm.cam = mav!!.getBufCam("main")
         oops!!.addMasterScript("testdm", dm)
         oops!!.launchScript("testdm")
     }
@@ -76,9 +64,8 @@ class ShootyShoot : ApplicationAdapter() {
             mav!!.palette[2].set(Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,1f)
         }
 
-        fb!!.begin()
-        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        mav!!.startBuffer("main")
+        mav!!.clear(0.1f,0.1f,0.1f,1f)
 
         //game logic
         oops!!.step(deltatime)
@@ -89,25 +76,21 @@ class ShootyShoot : ApplicationAdapter() {
             e.printStackTrace()
         }
 
-        mav!!.batch!!.begin()
-
-//        mav!!.drawString("hullo",0f,346f)
-//        mav!!.Font!!.draw(mav!!.batch!!,"hullo\nbye",0f,358f)
-//        mav!!.frame.get("girl")?.drawPal(mav!!.batch!!,pal,bigpal,Math.sin(statetime*Math.PI/2).toFloat()*64f,Math.cos(statetime*Math.PI/2).toFloat()*64f,1f,1f)
         mav!!.drawPal("_girl",4,0f,72f,72f,2f,2f,statetime*90, Vector2())
         mav!!.drawPal("_girl",0,0f,8f,8f,2f,2f,statetime*90)
         mav!!.drawPal("_girl",0,0f,40f,40f,2f,2f,statetime*90)
         mav!!.drawString("libmono","wubba lubba dub dub",Math.round(Math.sin(statetime*Math.PI/2)*64f+320f).toFloat(),Math.round(Math.cos(statetime*Math.PI/2)*64f+180f).toFloat(),1f,1f,0f,Vector2(0.5f,0.5f),mav!!.palette[2])
         mav!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f),mav!!.palette[2])
         mav!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
-        mav!!.batch!!.end()
-        fb!!.end()
-        mav!!.batch!!.begin()
-        mav!!.batch!!.draw(fbtr,0f,0f)
-        mav!!.batch!!.end()
 
+        mav!!.drawingShape()
+        mav!!.shape?.color = Color(0f,0f,1f,1f)
+        mav!!.shape?.circle(320f,180f,100f,Math.round(statetime+5))
 
-
+        mav!!.stopBuffer()
+        mav!!.clear()
+        mav!!.drawBuffer("main",0f,0f,1f,1f,statetime*5-10,Vector2(320f,180f))
+        mav!!.drawingOff()
     }
 
 
@@ -123,6 +106,8 @@ class ShootyShoot : ApplicationAdapter() {
 
 
     fun mkav() {
+
+        mav?.newBuffer("main",640,360,640f,360f)
 
         mav?.newImagePal("imgmap","gfx/imgmap.png",16,16)
         mav?.newSpritePal("girl","imgmap",0,0)

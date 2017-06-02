@@ -1,10 +1,14 @@
 package net.jorhlok.multiav
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import java.util.HashMap
@@ -14,6 +18,8 @@ import java.util.HashMap
  * @author Jorhlok
  */
 class MultiGfxRegister {
+    enum class DrawingState {sprite,shape,off}
+
     //indexed gfx
     private var imagePal = HashMap<String, ImagePal>()
     private var framePal = HashMap<String, FramePal>()
@@ -28,28 +34,64 @@ class MultiGfxRegister {
     private var fonts = HashMap<String, BitmapFont>()
     private var fontsampling = HashMap<String, Float>()
 
-    //shape gfx
+    //framebuffers
+    private var buffers = HashMap<String, PixBuf>()
+    private var mybuf = ""
 
 
-//    private var Letters = HashMap<Char, TextureRegion>()
 //    private var SFX = HashMap<String, SEffect>()
 //    private var Mus = HashMap<String, MTrack>()
-//    private var Font: BitmapFont? = null //assumes monospace fonts
-//    private var DrawableChars: String? = null
 
     var batch: Batch? = null
-    var sr: ShapeRenderer? = null
-    var mainfb: FrameBuffer? = null
-    var mainfbtex: TextureRegion? = null
-    var fxfb: FrameBuffer? = null
-    var fxfbtex: TextureRegion? = null
-    var camera: OrthographicCamera? = null
-
+    var shape: ShapeRenderer? = null
+    var camera = OrthographicCamera()
     var palette = Array<Color>()
-    var xyscale = Vector2(1f,1f)
-    var camPos = Vector2(0f,0f)
-//    var tabLength = 4f
-//    var fontSampling = 1f
+    private var status = DrawingState.off
+
+    fun drawingSprite() {
+        when (status) {
+            DrawingState.off -> {
+                batch?.begin()
+                status = DrawingState.sprite
+            }
+            DrawingState.shape -> {
+                shape?.flush()
+                shape?.end()
+                batch?.begin()
+                status = DrawingState.sprite
+            }
+        }
+    }
+
+    fun drawingShape() {
+        when (status) {
+            DrawingState.off -> {
+                shape?.begin()
+                status = DrawingState.shape
+            }
+            DrawingState.sprite -> {
+                batch?.flush()
+                batch?.end()
+                shape?.begin()
+                status = DrawingState.shape
+            }
+        }
+    }
+
+    fun drawingOff() {
+        when (status) {
+            DrawingState.sprite -> {
+                batch?.flush()
+                batch?.end()
+                status = DrawingState.off
+            }
+            DrawingState.shape -> {
+                shape?.flush()
+                shape?.end()
+                status = DrawingState.off
+            }
+        }
+    }
 
     fun newImagePal(key: String, uri: String, tw: Int, th: Int) {
         imagePal[key]?.dispose()
@@ -82,11 +124,9 @@ class MultiGfxRegister {
         fontsampling.put(key,sampling)
     }
 
-//    fun setFont(f: BitmapFont, chars: String) {
-//        if (Font != null) Font!!.dispose()
-//        Font = f
-//        DrawableChars = chars
-//    }
+    fun newBuffer(key: String, width: Int, height: Int, camwidth: Float, camheight: Float, format: Pixmap.Format = Pixmap.Format.RGBA8888) {
+        buffers[key] = PixBuf(width,height,camwidth,camheight,format)
+    }
 
 //    fun newSFX(key: String, uri: String) {
 //        val s = SFX[key]
@@ -108,6 +148,11 @@ class MultiGfxRegister {
 
     fun Generate() {
         batch = SpriteBatch()
+        shape = ShapeRenderer()
+        shape!!.setAutoShapeType(true)
+        camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        batch!!.projectionMatrix = camera.combined
+        shape!!.projectionMatrix = camera.combined
         //indexed color
         for (t in imagePal.values)
             t.Generate()
@@ -131,33 +176,15 @@ class MultiGfxRegister {
         }
         for (a in sequenceRgb.values)
             a.Generate(frameRgb)
-
-//        if (Font != null && DrawableChars != null && !DrawableChars!!.isEmpty()) {
-//            val dat = Font!!.data
-//            for (i in 0..DrawableChars!!.length - 1) {
-//                val glyph = dat.getGlyph(DrawableChars!![i])
-//                if (glyph != null) {
-//                    Letters.put(DrawableChars!![i], TextureRegion(Font!!.getRegion(glyph.page).texture, glyph.u, glyph.v, glyph.u2, glyph.v2))
-//                }
-//            }
-//        }
-
-//        for (s in SFX.values)
-//            s.Generate()
     }
 
-//    fun drawRegion(reg: TextureRegion, x: Float, y: Float, sw: Float, sh: Float, rot: Float) {
-//        //For some reson was drawing with width and height swapped and rotated 90 degrees when done normally
-//        batch?.draw(reg, x, y, 0f, 0f, reg.regionHeight.toFloat() * scale.y * sh, reg.regionWidth.toFloat() * scale.x * sw, 1f, 1f, rot - 90, false)
-//
-//
-//    }
-
     fun drawPal(anim: String, indexoffset: Short, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null) {
+        drawingSprite()
         if (batch != null) sequencePal[anim]?.draw(batch!!,palette,indexoffset,statetime,x,y,sw,sh,rot,center)
     }
 
     fun drawRgb(anim: String, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color = Color(1f,1f,1f,1f)) {
+        drawingSprite()
         if (batch != null) sequenceRgb[anim]?.draw(batch!!,statetime,x,y,sw,sh,rot,center, col)
     }
 
@@ -166,6 +193,7 @@ class MultiGfxRegister {
     }
 
     fun drawGlyphLayout(font: String, lay: GlyphLayout, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2(0.5f,0.5f), col: Color = Color(1f,1f,1f,1f)) {
+        drawingSprite()
         val f = fonts[font]
         val sampling = fontsampling[font]
         if (f != null && sampling!= null && batch != null) {
@@ -204,6 +232,114 @@ class MultiGfxRegister {
         return GlyphLayout()
     }
 
+    //TODO: put drawing shapes functions here
+
+    fun getBufCam(key: String): OrthographicCamera? {
+        val buf = buffers[key]
+        if (buf != null) return buf.cam
+        return null
+    }
+
+    fun clear(r: Float = 0f, g: Float = 0f, b: Float = 0f, a: Float = 1f) {
+        Gdx.gl.glClearColor(r,g,b,a)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+    }
+
+    fun clear(col: Color) {
+        clear(col.r,col.g,col.b,col.a)
+    }
+
+    fun blank() {
+        clear(0f,0f,0f,0f)
+    }
+
+    fun startBuffer(key: String) {
+        stopBuffer()
+        val buf = buffers[key]
+        if (buf != null) {
+            if (status != DrawingState.off) drawingOff()
+            mybuf = key
+            buf.begin()
+            buf.cam.update()
+            batch!!.projectionMatrix = buf.cam.combined
+            shape!!.projectionMatrix = buf.cam.combined
+        }
+    }
+
+    fun stopBuffer() {
+        if (mybuf != "") {
+            drawingOff()
+            buffers[mybuf]?.end()
+            camera.update()
+            batch!!.projectionMatrix = camera.combined
+            shape!!.projectionMatrix = camera.combined
+        }
+    }
+
+    fun drawBuffer(key:String, x: Float = 0f, y: Float = 0f, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2(), col: Color = Color(1f,1f,1f,1f)) {
+        var buf = buffers[key]
+        if (buf != null && batch != null) {
+            drawingSprite()
+            val oldcol = batch!!.color
+            batch!!.color = col
+            batch!!.draw(TextureRegion(buf.tex),x,y,center.x,center.y,buf.tex.regionWidth.toFloat(),buf.tex.regionHeight.toFloat(),sw,sh,rot)
+            batch!!.color = oldcol
+        }
+    }
+
+    fun drawBuffer(key:String, srcx: Int, srcy: Int, srcw: Int, srch: Int, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2(), col: Color = Color(1f,1f,1f,1f)) {
+        var buf = buffers[key]
+        if (buf != null && batch != null) {
+            drawingSprite()
+            val oldcol = batch!!.color
+            batch!!.color = col
+            batch!!.draw(TextureRegion(buf.tex,srcx,srcy,srcw,srch),x,y,center.x,center.y,buf.tex.regionWidth.toFloat(),buf.tex.regionHeight.toFloat(),sw,sh,rot)
+            batch!!.color = oldcol
+        }
+    }
+
+
+
+    fun dispose() {
+        drawingOff()
+        batch?.dispose()
+        batch = null
+
+        //indexed gfx
+        for (t in imagePal.values)
+            t.dispose()
+        for (s in framePal.values)
+            s.dispose()
+        for (a in sequencePal.values)
+            a.dispose()
+        imagePal = HashMap<String, ImagePal>()
+        framePal = HashMap<String, FramePal>()
+        sequencePal = HashMap<String, SequencePal>()
+
+        //rgb gfx
+        for (t in imageRgb.values)
+            t.dispose()
+        for (s in frameRgb.values)
+            s.dispose()
+        for (a in sequenceRgb.values)
+            a.dispose()
+        imageRgb = HashMap<String, ImageRgb>()
+        frameRgb = HashMap<String, FrameRgb>()
+        sequenceRgb = HashMap<String, SequenceRgb>()
+
+        //bitmap fonts
+        for (f in fonts.values)
+            f.dispose()
+        fonts = HashMap<String, BitmapFont>()
+
+        //framebuffers
+        for (b in buffers.values)
+            b.dispose()
+        buffers = HashMap<String, PixBuf>()
+    }
+}
+
+
 //    fun getSFX(key: String): SEffect? {
 //        return SFX[key]
 //    }
@@ -233,45 +369,7 @@ class MultiGfxRegister {
 //        }
 //    }
 
-    fun dispose() {
-        batch?.dispose()
-        batch = null
-        mainfb?.dispose()
-        mainfb = null
-        fxfb?.dispose()
-        fxfb = null
-
-        //indexed gfx
-        for (t in imagePal.values)
-            t.dispose()
-        for (s in framePal.values)
-            s.dispose()
-        for (a in sequencePal.values)
-            a.dispose()
-        imagePal = HashMap<String, ImagePal>()
-        framePal = HashMap<String, FramePal>()
-        sequencePal = HashMap<String, SequencePal>()
-
-        //rgb gfx
-        for (t in imageRgb.values)
-            t.dispose()
-        for (s in frameRgb.values)
-            s.dispose()
-        for (a in sequenceRgb.values)
-            a.dispose()
-        imageRgb = HashMap<String, ImageRgb>()
-        frameRgb = HashMap<String, FrameRgb>()
-        sequenceRgb = HashMap<String, SequenceRgb>()
-
-        //bitmap fonts
-        for (f in fonts.values)
-            f.dispose()
-        fonts = HashMap<String, BitmapFont>()
-
-
 //        for (s in SFX.values)
 //            s.dispose()
 //        for (m in Mus.values)
 //            m.dispose()
-    }
-}
