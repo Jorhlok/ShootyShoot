@@ -15,7 +15,7 @@ import net.jorhlok.oops.ObjectOrientedPlaySet
 
 
 class ShootyShoot : ApplicationAdapter() {
-    private var mav: MultiGfxRegister? = null
+    private var mgr: MultiGfxRegister? = null
     private var audio: MultiAudioRegister? = null
     private var oops: ObjectOrientedPlaySet? = null
     var statetime = 0f
@@ -31,31 +31,31 @@ class ShootyShoot : ApplicationAdapter() {
         bigpal.add(Color(0f,0f,0f,1f))
         bigpal.add(Color(4/15f,12/15f,2/15f,1f))
         bigpal.add(Color(13/15f,13/15f,13/15f,1f))
-        mav = MultiGfxRegister()
-        mav!!.palette = bigpal
+        mgr = MultiGfxRegister()
+        mgr!!.palette = bigpal
         audio = MultiAudioRegister()
         mkav()
-        mav!!.Generate()
-        mav!!.camera.setToOrtho(false,640f,360f)
-        mav!!.camera.update()
+        mgr!!.Generate()
+        mgr!!.camera.setToOrtho(false,640f,360f)
+        mgr!!.camera.update()
         audio!!.Generate()
 
         audio!!.setMusVolume(0.125f)
         audio!!.setSFXVolume(0.25f)
 
         oops = ObjectOrientedPlaySet()
-        oops!!.setMAV(mav)
+        oops!!.MGR = mgr
         oops!!.addTileMap("test0", TmxMapLoader(InternalFileHandleResolver()).load("map/test0.tmx"))
         oops!!.addTileMap("test1", TmxMapLoader(InternalFileHandleResolver()).load("map/test1.tmx"))
         oops!!.addEntityType("testplat", TestPlatformer::class.java)
 
         val dm = TestDM("test1", null)
-//        dm.cam = mav!!.getBufCam("main")
+//        dm.cam = mgr!!.getBufCam("main")
         oops!!.addMasterScript("testdm", dm)
         oops!!.launchScript("testdm")
         var m = audio?.getMus("frcasio")
         m?.Generate()
-        m?.play(true)
+//        m?.play(true)
     }
 
 
@@ -67,7 +67,7 @@ class ShootyShoot : ApplicationAdapter() {
             System.out.println("${Gdx.graphics.framesPerSecond} FPS")
             statetime -= 4f
             val f = 1f
-            mav!!.palette[2].set(Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,1f)
+            mgr!!.palette[2].set(Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,1f)
 //            audio?.playSFX("pew")
             when (Math.round(Math.random()*3).toInt()) {
                 1 -> audio?.playSFX("pew")
@@ -77,18 +77,18 @@ class ShootyShoot : ApplicationAdapter() {
             }
         }
 
-//        val c = mav!!.getBufCam("main")
+//        val c = mgr!!.getBufCam("main")
 //        c!!.translate(Math.sin(statetime*Math.PI/2).toFloat(),Math.cos(statetime*Math.PI/2).toFloat())
 //        c!!.rotate(Math.sin(statetime*Math.PI/2).toFloat())
 //        c!!.zoom = 0.5f
 //        c!!.update()
 
 
-        mav!!.startBuffer("main")
-        mav!!.clear(0.1f,0.1f,0.1f,1f)
+        mgr!!.startBuffer("main")
+        mgr!!.clear(0.1f,0.1f,0.1f,1f)
 
-        mav!!.fillShapes()
-        mav!!.drawCircle(320f,180f,Math.sin(statetime*Math.PI/2).toFloat()*4+12,Color(0.2f,0.3f,1f,1f))
+        mgr!!.fillShapes()
+        mgr!!.drawCircle(320f,180f,Math.sin(statetime*Math.PI/2).toFloat()*4+12,Color(0.2f,0.3f,1f,1f))
 
         //game logic
         oops!!.step(deltatime)
@@ -99,17 +99,17 @@ class ShootyShoot : ApplicationAdapter() {
             e.printStackTrace()
         }
 
-        mav!!.drawPal("_girl",4,0f,64f,64f,2f,2f,statetime*90, Vector2())
-        mav!!.drawPal("_girl",0,0f,16f,16f,2f,2f,statetime*90)
-        mav!!.drawPal("_girl",0,0f,48f,48f,2f,2f,statetime*90)
-        mav!!.drawString("libmono","wubba lubba dub dub",Math.round(Math.sin(statetime*Math.PI/2)*64f+320f).toFloat(),Math.round(Math.cos(statetime*Math.PI/2)*64f+180f).toFloat(),1f,1f,0f,Vector2(0.5f,0.5f),mav!!.palette[2])
-        mav!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f),mav!!.palette[2])
-        mav!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
+        mgr!!.drawPal("_girl",4,0f,64f,64f,2f,2f,statetime*90, Vector2())
+        mgr!!.drawPal("_girl",0,0f,16f,16f,2f,2f,statetime*90)
+        mgr!!.drawPal("_girl",0,0f,48f,48f,2f,2f,statetime*90)
+        mgr!!.drawString("libmono","wubba lubba dub dub",Math.round(Math.sin(statetime*Math.PI/2)*64f+320f).toFloat(),Math.round(Math.cos(statetime*Math.PI/2)*64f+180f).toFloat(),1f,1f,0f,Vector2(0.5f,0.5f), mgr!!.palette[2])
+        mgr!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f), mgr!!.palette[2])
+        mgr!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
 
-        mav!!.stopBuffer()
-        mav!!.clear()
-        mav!!.drawBuffer("main",Math.sin(statetime*Math.PI/2).toFloat()*8f,0f)
-        mav!!.flush()
+        mgr!!.stopBuffer()
+        mgr!!.clear()
+        mgr!!.drawBuffer("main",Math.sin(statetime*Math.PI/2).toFloat()*8f,0f)
+        mgr!!.flush()
     }
 
 
@@ -120,23 +120,23 @@ class ShootyShoot : ApplicationAdapter() {
 
     override fun dispose() {
         oops?.dispose()
-        mav?.dispose()
+        mgr?.dispose()
         audio?.dispose()
     }
 
 
     fun mkav() {
 
-        mav?.newBuffer("main",640,360,640f,360f)
+        mgr?.newBuffer("main",640,360,640f,360f)
 
-        mav?.newImagePal("imgmap","gfx/imgmap.png",8,8)
-        mav?.newSpritePal("girl","imgmap",0,0,2,2)
+        mgr?.newImagePal("imgmap","gfx/imgmap.png",8,8)
+        mgr?.newSpritePal("girl","imgmap",0,0,2,2)
 
-        mav?.newSpritePal("column","imgmap",30,4,2,2)
+        mgr?.newSpritePal("column","imgmap",30,4,2,2)
 
 
-        mav?.newMapTilePal("sprites",241,4,"_column")
-//        mav?.newMapTileRgb("sprites",241,"paclf")
+        mgr?.newMapTilePal("sprites",241,4,"_column")
+//        mgr?.newMapTileRgb("sprites",241,"paclf")
 
         audio?.newMusic("frcasio", "bgm/FriendlyCasiotone.ogg")
         audio?.newMusic("mkds", "bgm/mkdsintro.ogg", "bgm/mkds.ogg")
@@ -153,56 +153,56 @@ class ShootyShoot : ApplicationAdapter() {
         parameter.magFilter = Texture.TextureFilter.Linear
         parameter.minFilter = Texture.TextureFilter.Linear
         parameter.hinting = FreeTypeFontGenerator.Hinting.Full
-        mav?.newFont("libmono",generator.generateFont(parameter),1f)
+        mgr?.newFont("libmono",generator.generateFont(parameter),1f)
         generator.dispose()
 
-        mav?.newImageRgb("sprites", "gfx/sprites.png", 16, 16)
+        mgr?.newImageRgb("sprites", "gfx/sprites.png", 16, 16)
 
-        mav?.newSpriteRgb("guyrt", "sprites", 0, 0, 1, 1, false, false)
-        mav?.newSpriteRgb("guylf", "sprites", 0, 0, 1, 1, true, false)
-        mav?.newSpriteRgb("gunrt", "sprites", 1, 0, 1, 1, false, false)
-        mav?.newSpriteRgb("gunlf", "sprites", 1, 0, 1, 1, true, false)
-        mav?.newSpriteRgb("pac0lf", "sprites", 14, 0, 1, 1, false, false)
-        mav?.newSpriteRgb("pac0rt", "sprites", 14, 0, 1, 1, true, false)
-        mav?.newSpriteRgb("pac1lf", "sprites", 15, 0, 1, 1, false, false)
-        mav?.newSpriteRgb("pac1rt", "sprites", 15, 0, 1, 1, true, false)
+        mgr?.newSpriteRgb("guyrt", "sprites", 0, 0, 1, 1, false, false)
+        mgr?.newSpriteRgb("guylf", "sprites", 0, 0, 1, 1, true, false)
+        mgr?.newSpriteRgb("gunrt", "sprites", 1, 0, 1, 1, false, false)
+        mgr?.newSpriteRgb("gunlf", "sprites", 1, 0, 1, 1, true, false)
+        mgr?.newSpriteRgb("pac0lf", "sprites", 14, 0, 1, 1, false, false)
+        mgr?.newSpriteRgb("pac0rt", "sprites", 14, 0, 1, 1, true, false)
+        mgr?.newSpriteRgb("pac1lf", "sprites", 15, 0, 1, 1, false, false)
+        mgr?.newSpriteRgb("pac1rt", "sprites", 15, 0, 1, 1, true, false)
 
-        mav?.newSpriteRgb("shot0", "sprites", 0, 1, 1, 1, false, false)
-        mav?.newSpriteRgb("shot1", "sprites", 1, 1, 1, 1, false, false)
-        mav?.newSpriteRgb("shot2", "sprites", 2, 1, 1, 1, false, false)
-        mav?.newSpriteRgb("shot3", "sprites", 3, 1, 1, 1, false, false)
+        mgr?.newSpriteRgb("shot0", "sprites", 0, 1, 1, 1, false, false)
+        mgr?.newSpriteRgb("shot1", "sprites", 1, 1, 1, 1, false, false)
+        mgr?.newSpriteRgb("shot2", "sprites", 2, 1, 1, 1, false, false)
+        mgr?.newSpriteRgb("shot3", "sprites", 3, 1, 1, 1, false, false)
 
-        mav?.newSpriteRgb("door", "sprites", 0, 2, 1, 1, false, false)
-        mav?.newSpriteRgb("pedestal", "sprites", 1, 2, 1, 1, false, false)
-        mav?.newSpriteRgb("alchemy", "sprites", 2, 2, 2, 1, false, false)
+        mgr?.newSpriteRgb("door", "sprites", 0, 2, 1, 1, false, false)
+        mgr?.newSpriteRgb("pedestal", "sprites", 1, 2, 1, 1, false, false)
+        mgr?.newSpriteRgb("alchemy", "sprites", 2, 2, 2, 1, false, false)
 
-        mav?.newSpriteRgb("mineral", "sprites", 0, 3, 1, 1, false, false)
-        mav?.newSpriteRgb("herb", "sprites", 1, 3, 1, 1, false, false)
-        mav?.newSpriteRgb("eyeball", "sprites", 2, 3, 1, 1, false, false)
-        mav?.newSpriteRgb("worm", "sprites", 3, 3, 1, 1, false, false)
-        mav?.newSpriteRgb("dollar", "sprites", 4, 3, 1, 1, false, false)
-        mav?.newSpriteRgb("potion", "sprites", 5, 3, 1, 1, false, false)
-        mav?.newSpriteRgb("mana", "sprites", 6, 3, 1, 1, false, false)
-        mav?.newSpriteRgb("coffee", "sprites", 7, 3, 1, 1, false, false)
+        mgr?.newSpriteRgb("mineral", "sprites", 0, 3, 1, 1, false, false)
+        mgr?.newSpriteRgb("herb", "sprites", 1, 3, 1, 1, false, false)
+        mgr?.newSpriteRgb("eyeball", "sprites", 2, 3, 1, 1, false, false)
+        mgr?.newSpriteRgb("worm", "sprites", 3, 3, 1, 1, false, false)
+        mgr?.newSpriteRgb("dollar", "sprites", 4, 3, 1, 1, false, false)
+        mgr?.newSpriteRgb("potion", "sprites", 5, 3, 1, 1, false, false)
+        mgr?.newSpriteRgb("mana", "sprites", 6, 3, 1, 1, false, false)
+        mgr?.newSpriteRgb("coffee", "sprites", 7, 3, 1, 1, false, false)
 
-        mav?.newSpriteRgb("redbar", "sprites", 0, 4, 1, 1, false, false)
-        mav?.newSpriteRgb("darkredbar", "sprites", 1, 4, 1, 1, false, false)
-        mav?.newSpriteRgb("bluebar", "sprites", 2, 4, 1, 1, false, false)
-        mav?.newSpriteRgb("darkbluebar", "sprites", 3, 4, 1, 1, false, false)
-        mav?.newSpriteRgb("yellowbar", "sprites", 4, 4, 1, 1, false, false)
-        mav?.newSpriteRgb("darkyellowbar", "sprites", 5, 4, 1, 1, false, false)
-        mav?.newSpriteRgb("uiback", "sprites", 6, 4, 1, 1, false, false)
-        mav?.newSpriteRgb("uislot", "sprites", 7, 4, 1, 1, false, false)
-        mav?.newSpriteRgb("cursor", "sprites", 8, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("redbar", "sprites", 0, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("darkredbar", "sprites", 1, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("bluebar", "sprites", 2, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("darkbluebar", "sprites", 3, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("yellowbar", "sprites", 4, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("darkyellowbar", "sprites", 5, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("uiback", "sprites", 6, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("uislot", "sprites", 7, 4, 1, 1, false, false)
+        mgr?.newSpriteRgb("cursor", "sprites", 8, 4, 1, 1, false, false)
 
-        mav?.newSpriteRgb("greenblock", "sprites", 0, 15, 1, 1, false, false)
-        mav?.newSpriteRgb("skyblueblock", "sprites", 1, 15, 1, 1, false, false)
-        mav?.newSpriteRgb("whiteblock", "sprites", 2, 15, 1, 1, false, false)
-        mav?.newSpriteRgb("greyblock", "sprites", 3, 15, 1, 1, false, false)
+        mgr?.newSpriteRgb("greenblock", "sprites", 0, 15, 1, 1, false, false)
+        mgr?.newSpriteRgb("skyblueblock", "sprites", 1, 15, 1, 1, false, false)
+        mgr?.newSpriteRgb("whiteblock", "sprites", 2, 15, 1, 1, false, false)
+        mgr?.newSpriteRgb("greyblock", "sprites", 3, 15, 1, 1, false, false)
 
-        mav?.newAnimRgb("newshot", Array<String>(arrayOf("shot0", "shot1", "shot2")), 0.125f, Animation.PlayMode.NORMAL)
-        mav?.newAnimRgb("shot", Array<String>(arrayOf("shot3", "shot2")), 0.01f, Animation.PlayMode.LOOP)
-        mav?.newAnimRgb("paclf", Array<String>(arrayOf("pac0lf", "pac1lf")), 0.5f, Animation.PlayMode.LOOP)
-        mav?.newAnimRgb("pacrt", Array<String>(arrayOf("pac0rt", "pac1rt")), 0.5f, Animation.PlayMode.LOOP)
+        mgr?.newAnimRgb("newshot", Array<String>(arrayOf("shot0", "shot1", "shot2")), 0.125f, Animation.PlayMode.NORMAL)
+        mgr?.newAnimRgb("shot", Array<String>(arrayOf("shot3", "shot2")), 0.01f, Animation.PlayMode.LOOP)
+        mgr?.newAnimRgb("paclf", Array<String>(arrayOf("pac0lf", "pac1lf")), 0.5f, Animation.PlayMode.LOOP)
+        mgr?.newAnimRgb("pacrt", Array<String>(arrayOf("pac0rt", "pac1rt")), 0.5f, Animation.PlayMode.LOOP)
     }
 }
