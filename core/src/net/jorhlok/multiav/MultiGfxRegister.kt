@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
+import com.badlogic.gdx.maps.tiled.renderers.BatchTiledMapRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
@@ -40,12 +42,11 @@ class MultiGfxRegister {
     private var buffers = HashMap<String, PixBuf>()
     private var mybuf = ""
 
+    //tile layer translation
+    private var tiletrans = HashMap<String, HashMap<Int,TileTranslator>>()
 
-//    private var SFX = HashMap<String, SEffect>()
-//    private var Mus = HashMap<String, MTrack>()
 
-    var batch: Batch? = null
-        get() = field
+    private var batch: Batch? = null
     private var shape: ShapeRenderer? = null
     private var shapetype: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Line
     private var status = DrawingState.off
@@ -88,23 +89,24 @@ class MultiGfxRegister {
         buffers[key] = PixBuf(width,height,camwidth,camheight,format)
     }
 
-//    fun newSFX(key: String, uri: String) {
-//        val s = SFX[key]
-//        s?.dispose()
-//        SFX.put(key, SEffect(key, uri))
-//    }
-//
-//    fun newMusic(key: String, uri: String) {
-//        val m = Mus[key]
-//        m?.dispose()
-//        Mus.put(key, MTrack(key, uri))
-//    }
-//
-//    fun newMusic(key: String, intro: String, body: String) {
-//        val m = Mus[key]
-//        m?.dispose()
-//        Mus.put(key, MTrack(key, intro, body))
-//    }
+    fun newMapTilePal(mapkey: String, id: Int, paloff: Short, anim: String, animH: String = "", animV:String = ", ", animHV:String = "", rotate: Boolean = false) {
+        var map = tiletrans[mapkey]
+        if (map == null) {
+            tiletrans[mapkey] = HashMap<Int,TileTranslator>()
+            map = tiletrans[mapkey]
+        }
+        map!![id] = TileTranslator(true,paloff.toInt(),rotate,anim,animH,animV,animHV)
+    }
+
+    fun newMapTileRgb(mapkey: String, id: Int, anim: String, animH: String = "", animV:String = ", ", animHV:String = "", rotate: Boolean = false, col: Color = Color(1f,1f,1f,1f)) {
+        var map = tiletrans[mapkey]
+        if (map == null) {
+            tiletrans[mapkey] = HashMap<Int,TileTranslator>()
+            map = tiletrans[mapkey]
+        }
+        map!![id] = TileTranslator(false,col.toIntBits(),rotate,anim,animH,animV,animHV)
+    }
+
 
     fun Generate() {
         batch = SpriteBatch()
@@ -136,6 +138,44 @@ class MultiGfxRegister {
         }
         for (a in sequenceRgb.values)
             a.Generate(frameRgb)
+    }
+
+    fun dispose() {
+        drawingOff()
+        batch?.dispose()
+        batch = null
+
+        //indexed gfx
+        for (t in imagePal.values)
+            t.dispose()
+        for (s in framePal.values)
+            s.dispose()
+        for (a in sequencePal.values)
+            a.dispose()
+        imagePal = HashMap<String, ImagePal>()
+        framePal = HashMap<String, FramePal>()
+        sequencePal = HashMap<String, SequencePal>()
+
+        //rgb gfx
+        for (t in imageRgb.values)
+            t.dispose()
+        for (s in frameRgb.values)
+            s.dispose()
+        for (a in sequenceRgb.values)
+            a.dispose()
+        imageRgb = HashMap<String, ImageRgb>()
+        frameRgb = HashMap<String, FrameRgb>()
+        sequenceRgb = HashMap<String, SequenceRgb>()
+
+        //bitmap fonts
+        for (f in fonts.values)
+            f.dispose()
+        fonts = HashMap<String, BitmapFont>()
+
+        //framebuffers
+        for (b in buffers.values)
+            b.dispose()
+        buffers = HashMap<String, PixBuf>()
     }
 
     private fun drawingSprite() {
@@ -522,77 +562,56 @@ class MultiGfxRegister {
     }
 
 
+    fun drawTileLayer(layer: TiledMapTileLayer, key: String, unitScale: Float, statetime: Float, camin: OrthographicCamera? = null) {
+        //this method is adapted from OrthogonalTiledMapRenderer.renderTileLayer(TiledMapTileLayer)
+        val layerWidth = layer.getWidth()
+        val layerHeight = layer.getHeight()
 
-    fun dispose() {
-        drawingOff()
-        batch?.dispose()
-        batch = null
+        val layerTileWidth = layer.getTileWidth() * unitScale
+        val layerTileHeight = layer.getTileHeight() * unitScale
 
-        //indexed gfx
-        for (t in imagePal.values)
-            t.dispose()
-        for (s in framePal.values)
-            s.dispose()
-        for (a in sequencePal.values)
-            a.dispose()
-        imagePal = HashMap<String, ImagePal>()
-        framePal = HashMap<String, FramePal>()
-        sequencePal = HashMap<String, SequencePal>()
 
-        //rgb gfx
-        for (t in imageRgb.values)
-            t.dispose()
-        for (s in frameRgb.values)
-            s.dispose()
-        for (a in sequenceRgb.values)
-            a.dispose()
-        imageRgb = HashMap<String, ImageRgb>()
-        frameRgb = HashMap<String, FrameRgb>()
-        sequenceRgb = HashMap<String, SequenceRgb>()
+        var cam = camera
+        if (camin != null) cam = camin
+        else if (mybuf != "") cam = getBufCam(mybuf)!!
 
-        //bitmap fonts
-        for (f in fonts.values)
-            f.dispose()
-        fonts = HashMap<String, BitmapFont>()
+        //below 5 lines adapted from BatchTiledMapRenderer.setView(OrthographicCamera)
+        val width = cam.viewportWidth * cam.zoom
+        val height = cam.viewportHeight * cam.zoom
+        val w = width * Math.abs(cam.up.y) + height * Math.abs(cam.up.x)
+        val h = height * Math.abs(cam.up.y) + width * Math.abs(cam.up.x)
+        var viewBounds = Rectangle(cam.position.x - w / 2, cam.position.y - h / 2, w, h)
 
-        //framebuffers
-        for (b in buffers.values)
-            b.dispose()
-        buffers = HashMap<String, PixBuf>()
+
+        val col1 = Math.max(0, (viewBounds.x / layerTileWidth).toInt())
+        val col2 = Math.min(layerWidth, ((viewBounds.x + viewBounds.width + layerTileWidth) / layerTileWidth).toInt())
+
+        val row1 = Math.max(0, (viewBounds.y / layerTileHeight).toInt())
+        val row2 = Math.min(layerHeight, ((viewBounds.y + viewBounds.height + layerTileHeight) / layerTileHeight).toInt())
+
+        var y = row2 * layerTileHeight
+        val xStart = col1 * layerTileWidth
+
+        val maptrans = tiletrans[key]
+
+        if (maptrans != null) for (row in row2 downTo row1) {
+            var x = xStart
+            for (col in col1..col2 - 1) {
+                val cell = layer.getCell(col, row)
+                if (cell == null) {
+                    x += layerTileWidth
+                    continue
+                }
+
+                maptrans[cell.tile?.id]?.draw(this,cell,statetime,x,y)
+
+                x += layerTileWidth
+            }
+            y -= layerTileHeight
+        }
     }
 }
 
 
-//    fun getSFX(key: String): SEffect? {
-//        return SFX[key]
-//    }
-//
-//    fun getMus(key: String): MTrack? {
-//        return Mus[key]
-//    }
-//
-//    fun playSFX(key: String) {
-//        SFX[key]?.play()
-//    }
-//
-//    fun setSFXVolume(v: Float) {
-//        for (s in SFX.values)
-//            s.setVolume(v)
-//    }
-//
-//    fun setMusVolume(v: Float) {
-//        for (m in Mus.values)
-//            m.setVolume(v)
-//    }
-//
-//    fun killMusic() {
-//        for (m in Mus.values) {
-//            m.stop()
-//            m.dispose()
-//        }
-//    }
 
-//        for (s in SFX.values)
-//            s.dispose()
-//        for (m in Mus.values)
-//            m.dispose()
+

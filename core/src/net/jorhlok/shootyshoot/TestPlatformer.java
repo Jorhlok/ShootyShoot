@@ -14,12 +14,14 @@ public class TestPlatformer extends Physical {
     protected boolean jump;
     protected boolean left;
     protected boolean right;
+
+    protected boolean drawdir;
     
     public TestPlatformer() {
         AABB.set(0.125f,0,0.75f,1);
         Tolerance.set(0.5f, 0.5f);
         Position.set(5, 8);
-        Gravity = new Vector2 (0, -10f);
+        Gravity = new Vector2 (0, -20f);
     }
     
     @Override
@@ -34,18 +36,20 @@ public class TestPlatformer extends Physical {
                     jump = p.iValue != 0;
                     if (/*Grounded &&*/ jump && !oldjump) {
                         //jump!
-                        Velocity.add(0, 16);
-                        if (Velocity.y > 16) Velocity.y = 16;
+                        Velocity.add(0, 20);
+                        if (Velocity.y > 20) Velocity.y = 20;
                         Grounded = false;
                     }
                 } else if (p.Name.equals("left")) {
                     left = p.iValue != 0;
+                    if (left) drawdir = false;
                 } else if (p.Name.equals("right")) {
                     right = p.iValue != 0;
+                    if (right) drawdir = true;
                 }
                 
-                if (left && !right) Velocity.x = -6;
-                else if (right && !left) Velocity.x = 6;
+                if (left && !right) Velocity.x = -8;
+                else if (right && !left) Velocity.x = 8;
                 else Velocity.x = 0;
             }
         }
@@ -71,8 +75,13 @@ public class TestPlatformer extends Physical {
     
     @Override
     public void draw(MultiGfxRegister mav) {
-        mav.drawRgb("_gunrt", 0f, (Position.x+0.75f)*16, Position.y*16,1,1,0,new Vector2(),new Color(1f,1f,1f,1f));
-        mav.drawRgb("_guyrt", 0f, Position.x*16, Position.y*16,1,1,0,new Vector2(),new Color(1f,1f,1f,1f));
+        if (drawdir) {
+            mav.drawRgb("_gunrt", 0f, (Position.x + 0.75f) * 16, Position.y * 16, 1, 1, 0, new Vector2(), new Color(1f, 1f, 1f, 1f));
+            mav.drawRgb("_guyrt", 0f, Position.x * 16, Position.y * 16, 1, 1, 0, new Vector2(), new Color(1f, 1f, 1f, 1f));
+        } else {
+            mav.drawRgb("_gunlf", 0f, (Position.x - 0.75f) * 16, Position.y * 16, 1, 1, 0, new Vector2(), new Color(1f, 1f, 1f, 1f));
+            mav.drawRgb("_guylf", 0f, Position.x * 16, Position.y * 16, 1, 1, 0, new Vector2(), new Color(1f, 1f, 1f, 1f));
+        }
     }
     
     

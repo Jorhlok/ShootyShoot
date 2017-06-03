@@ -36,7 +36,7 @@ class FrameRgb(
         var s = Sprite(Tile)
         if (center != null) s.setOrigin(center.x, center.y)
         else s.setOriginCenter()
-        s.translate(x, y)
+        s.translate(x-s.originX, y-s.originY)
         s.setScale(sw, sh)
         s.rotate(rot)
         s.color = col

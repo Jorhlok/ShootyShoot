@@ -9,12 +9,14 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
+import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
 import net.jorhlok.oops.ObjectOrientedPlaySet
 
 
 class ShootyShoot : ApplicationAdapter() {
     private var mav: MultiGfxRegister? = null
+    private var audio: MultiAudioRegister? = null
     private var oops: ObjectOrientedPlaySet? = null
     var statetime = 0f
 
@@ -31,12 +33,15 @@ class ShootyShoot : ApplicationAdapter() {
         bigpal.add(Color(13/15f,13/15f,13/15f,1f))
         mav = MultiGfxRegister()
         mav!!.palette = bigpal
+        audio = MultiAudioRegister()
         mkav()
         mav!!.Generate()
         mav!!.camera.setToOrtho(false,640f,360f)
         mav!!.camera.update()
+        audio!!.Generate()
 
-//        mav.setMusVolume(0.5f)
+        audio!!.setMusVolume(0.125f)
+        audio!!.setSFXVolume(0.25f)
 
         oops = ObjectOrientedPlaySet()
         oops!!.setMAV(mav)
@@ -45,9 +50,12 @@ class ShootyShoot : ApplicationAdapter() {
         oops!!.addEntityType("testplat", TestPlatformer::class.java)
 
         val dm = TestDM("test1", null)
-        dm.cam = mav!!.getBufCam("main")
+//        dm.cam = mav!!.getBufCam("main")
         oops!!.addMasterScript("testdm", dm)
         oops!!.launchScript("testdm")
+        var m = audio?.getMus("frcasio")
+        m?.Generate()
+        m?.play(true)
     }
 
 
@@ -60,13 +68,27 @@ class ShootyShoot : ApplicationAdapter() {
             statetime -= 4f
             val f = 1f
             mav!!.palette[2].set(Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,1f)
+//            audio?.playSFX("pew")
+            when (Math.round(Math.random()*3).toInt()) {
+                1 -> audio?.playSFX("pew")
+                2 -> audio?.playSFX("jump")
+                3 -> audio?.playSFX("dash")
+                else -> audio?.playSFX("growl")
+            }
         }
+
+//        val c = mav!!.getBufCam("main")
+//        c!!.translate(Math.sin(statetime*Math.PI/2).toFloat(),Math.cos(statetime*Math.PI/2).toFloat())
+//        c!!.rotate(Math.sin(statetime*Math.PI/2).toFloat())
+//        c!!.zoom = 0.5f
+//        c!!.update()
+
 
         mav!!.startBuffer("main")
         mav!!.clear(0.1f,0.1f,0.1f,1f)
 
         mav!!.fillShapes()
-        mav!!.drawCircle(320f,180f,64f,Math.round(Math.sin(statetime*Math.PI/2).toFloat()*3+9),Color(0.2f,0.3f,1f,1f))
+        mav!!.drawCircle(320f,180f,Math.sin(statetime*Math.PI/2).toFloat()*4+12,Color(0.2f,0.3f,1f,1f))
 
         //game logic
         oops!!.step(deltatime)
@@ -77,9 +99,9 @@ class ShootyShoot : ApplicationAdapter() {
             e.printStackTrace()
         }
 
-        mav!!.drawPal("_girl",4,0f,72f,72f,2f,2f,statetime*90, Vector2())
-        mav!!.drawPal("_girl",0,0f,8f,8f,2f,2f,statetime*90)
-        mav!!.drawPal("_girl",0,0f,40f,40f,2f,2f,statetime*90)
+        mav!!.drawPal("_girl",4,0f,64f,64f,2f,2f,statetime*90, Vector2())
+        mav!!.drawPal("_girl",0,0f,16f,16f,2f,2f,statetime*90)
+        mav!!.drawPal("_girl",0,0f,48f,48f,2f,2f,statetime*90)
         mav!!.drawString("libmono","wubba lubba dub dub",Math.round(Math.sin(statetime*Math.PI/2)*64f+320f).toFloat(),Math.round(Math.cos(statetime*Math.PI/2)*64f+180f).toFloat(),1f,1f,0f,Vector2(0.5f,0.5f),mav!!.palette[2])
         mav!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f),mav!!.palette[2])
         mav!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
@@ -99,6 +121,7 @@ class ShootyShoot : ApplicationAdapter() {
     override fun dispose() {
         oops?.dispose()
         mav?.dispose()
+        audio?.dispose()
     }
 
 
@@ -106,28 +129,31 @@ class ShootyShoot : ApplicationAdapter() {
 
         mav?.newBuffer("main",640,360,640f,360f)
 
-        mav?.newImagePal("imgmap","gfx/imgmap.png",16,16)
-        mav?.newSpritePal("girl","imgmap",0,0)
+        mav?.newImagePal("imgmap","gfx/imgmap.png",8,8)
+        mav?.newSpritePal("girl","imgmap",0,0,2,2)
 
-//        mav.newMusic("frcasio", "bgm/FriendlyCasiotone.ogg")
-//        mav.newMusic("mkds", "bgm/mkdsintro.ogg", "bgm/mkds.ogg")
-//
-//        mav.newSFX("pew", "sfx/pew.wav")
-//        mav.newSFX("jump", "sfx/jump.wav")
-//        mav.newSFX("dash", "sfx/dash.wav")
-//        mav.newSFX("growl", "sfx/growl.wav")
-//
+        mav?.newSpritePal("column","imgmap",30,4,2,2)
+
+
+        mav?.newMapTilePal("sprites",241,4,"_column")
+//        mav?.newMapTileRgb("sprites",241,"paclf")
+
+        audio?.newMusic("frcasio", "bgm/FriendlyCasiotone.ogg")
+        audio?.newMusic("mkds", "bgm/mkdsintro.ogg", "bgm/mkds.ogg")
+
+        audio?.newSFX("pew", "sfx/pew.wav")
+        audio?.newSFX("jump", "sfx/jump.wav")
+        audio?.newSFX("dash", "sfx/dash.wav")
+        audio?.newSFX("growl", "sfx/growl.wav")
+
+
         val generator = FreeTypeFontGenerator(Gdx.files.internal("gfx/libmono.ttf"))
         val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
         parameter.size = 14 * 1
-//        parameter.genMipMaps = true
         parameter.magFilter = Texture.TextureFilter.Linear
         parameter.minFilter = Texture.TextureFilter.Linear
-        //parameter.characters = parameter.characters + "▄■";
         parameter.hinting = FreeTypeFontGenerator.Hinting.Full
         mav?.newFont("libmono",generator.generateFont(parameter),1f)
-//        mav?.setFont(generator.generateFont(parameter), parameter.characters)
-//        mav?.fontSampling = 1f
         generator.dispose()
 
         mav?.newImageRgb("sprites", "gfx/sprites.png", 16, 16)
