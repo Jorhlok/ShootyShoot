@@ -2,7 +2,6 @@ package net.jorhlok.oops
 
 import com.badlogic.gdx.maps.tiled.TiledMap
 import java.util.HashMap
-import net.jorhlok.multiav.MultiGfxRegister
 
 /**
  * Object Oriented Gameplay Setup
@@ -10,22 +9,18 @@ import net.jorhlok.multiav.MultiGfxRegister
  * Meant to be used as-is
  * @author Jorhlok
  */
-class ObjectOrientedPlaySet {
+class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     //setup
     var TileMap: MutableMap<String, TiledMap> = HashMap()
-    var EntityType: MutableMap<String, Class<out Entity>> = HashMap()
+    override var GlobalData: MutableMap<String, LabelledObject> = HashMap()
     var MasterScript: MutableMap<String, DungeonMaster> = HashMap()
 
     //runtime
-    var MGR: MultiGfxRegister? = null
+    var DrawObj = LabelledObject()
     var Here: DungeonMaster? = null
 
     fun addTileMap(key: String, map: TiledMap) {
         TileMap.put(key, map)
-    }
-
-    fun addEntityType(key: String, clazz: Class<out Entity>) {
-        EntityType.put(key, clazz)
     }
 
     fun addMasterScript(key: String, script: DungeonMaster) {
@@ -33,41 +28,24 @@ class ObjectOrientedPlaySet {
         MasterScript.put(key, script)
     }
 
-//    fun setMGR(mgr: MultiGfxRegister) {
-//        MGR = mgr
-//    }
-
     fun step(deltatime: Float) {
         if (Here != null) Here!!.update(deltatime)
     }
 
     fun draw(deltatime: Float) {
-        if (Here != null) Here!!.draw(deltatime, MGR)
+        if (Here != null) Here!!.draw(deltatime, DrawObj)
     }
 
-    fun launchScript(key: String) {
+    override fun launchScript(key: String) {
         if (Here != null) {
             Here!!.end()
             Here!!.dispose()
         }
         Here = MasterScript[key]
         if (Here != null) {
-            Here!!.create(TileMap, EntityType)
+            Here!!.create(TileMap,this)
             Here!!.begin()
         }
-    }
-
-    /**
-     * Polymorphism to the max!
-     */
-    fun mkentity(key: String): Entity? {
-        try {
-            return EntityType[key]?.newInstance()
-        } catch (e: Exception) {
-            System.err.println("Unable to make a new " + key + " because:\n" + e.toString())
-            return null
-        }
-
     }
 
     fun dispose() {
@@ -79,7 +57,7 @@ class ObjectOrientedPlaySet {
             t.dispose()
         }
         TileMap.clear()
-        EntityType.clear()
+        GlobalData.clear()
         MasterScript.clear()
     }
 }

@@ -44,7 +44,7 @@ class ShootyShoot : ApplicationAdapter() {
         audio!!.setSFXVolume(0.25f)
 
         oops = ObjectOrientedPlaySet()
-        oops!!.MGR = mgr
+        oops!!.DrawObj = mgr
         oops!!.addTileMap("test0", TmxMapLoader(InternalFileHandleResolver()).load("map/test0.tmx"))
         oops!!.addTileMap("test1", TmxMapLoader(InternalFileHandleResolver()).load("map/test1.tmx"))
         oops!!.addEntityType("testplat", TestPlatformer::class.java)
