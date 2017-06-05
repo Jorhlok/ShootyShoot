@@ -12,8 +12,9 @@ import java.util.HashMap
 class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     //setup
     var TileMap: MutableMap<String, TiledMap> = HashMap()
-    override var GlobalData: MutableMap<String, LabelledObject> = HashMap()
     var MasterScript: MutableMap<String, DungeonMaster> = HashMap()
+    override var GlobalData: MutableMap<String, LabelledObject> = HashMap()
+    var FrameThreshold = 0.5f
 
     //runtime
     var DrawObj = LabelledObject()
@@ -29,7 +30,9 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     }
 
     fun step(deltatime: Float) {
-        if (Here != null) Here!!.update(deltatime)
+        if (deltatime < FrameThreshold) Here?.update(deltatime)
+        else System.err.println("Whoa, a frame took ${deltatime}s which is waaaaay longer than the threshold of ${FrameThreshold}.\n" +
+                "Physics surely would have broken down had I let this frame run.")
     }
 
     fun draw(deltatime: Float) {
