@@ -41,21 +41,14 @@ class ShootyShoot : ApplicationAdapter() {
         mgr!!.camera.update()
         audio!!.Generate()
 
-        audio!!.setMusVolume(0.125f)
-        audio!!.setSFXVolume(0.25f)
-
         oops = ObjectOrientedPlaySet()
-        oops!!.DrawObj = LabelledObject("MultiAV",arrayOf(mgr,audio))
         oops!!.addTileMap("test0", TmxMapLoader(InternalFileHandleResolver()).load("map/test0.tmx"))
         oops!!.addTileMap("test1", TmxMapLoader(InternalFileHandleResolver()).load("map/test1.tmx"))
+        oops!!.addTileMap("test2", TmxMapLoader(InternalFileHandleResolver()).load("map/test2.tmx"))
 
-        val dm = TestDM("test1")
-//        dm.cam = mgr!!.getBufCam("main")
+        val dm = TestDM("test2",mgr!!,audio!!)
         oops!!.addMasterScript("testdm", dm)
         oops!!.launchScript("testdm")
-//        var m = audio?.getMus("frcasio")
-//        m?.Generate()
-//        m?.play(true)
     }
 
 
@@ -66,14 +59,6 @@ class ShootyShoot : ApplicationAdapter() {
         if (statetime >= 4) {
             System.out.println("${Gdx.graphics.framesPerSecond} FPS")
             statetime -= 4f
-            val f = 1f
-            mgr!!.palette[2].set(Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,1f)
-//            when (Math.round(Math.random()*3).toInt()) {
-//                1 -> audio?.playSFX("pew")
-//                2 -> audio?.playSFX("jump")
-//                3 -> audio?.playSFX("dash")
-//                else -> audio?.playSFX("growl")
-//            }
         }
 
 //        val c = mgr!!.getBufCam("main")
@@ -83,11 +68,9 @@ class ShootyShoot : ApplicationAdapter() {
 //        c!!.update()
 
 
-        mgr!!.startBuffer("main")
-        mgr!!.clear(0.1f,0.1f,0.1f,1f)
 
-        mgr!!.fillShapes()
-        mgr!!.drawCircle(320f,180f,Math.sin(statetime*Math.PI/2).toFloat()*4+12,Color(0.2f,0.3f,1f,1f))
+//        mgr!!.fillShapes()
+//        mgr!!.drawCircle(320f,180f,Math.sin(statetime*Math.PI/2).toFloat()*4+12,Color(0.2f,0.3f,1f,1f))
 
         //game logic
         oops!!.step(deltatime)
@@ -98,17 +81,13 @@ class ShootyShoot : ApplicationAdapter() {
             e.printStackTrace()
         }
 
-        mgr!!.drawPal("_girl",4,0f,64f,64f,2f,2f,statetime*90, Vector2())
-        mgr!!.drawPal("_girl",0,0f,16f,16f,2f,2f,statetime*90)
-        mgr!!.drawPal("_girl",0,0f,48f,48f,2f,2f,statetime*90)
-        mgr!!.drawString("libmono","wubba lubba dub dub",Math.round(Math.sin(statetime*Math.PI/2)*64f+320f).toFloat(),Math.round(Math.cos(statetime*Math.PI/2)*64f+180f).toFloat(),1f,1f,0f,Vector2(0.5f,0.5f), mgr!!.palette[2])
-        mgr!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f), mgr!!.palette[2])
-        mgr!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
+//        mgr!!.drawPal("_girl",4,0f,64f,64f,2f,2f,statetime*90, Vector2())
+//        mgr!!.drawPal("_girl",0,0f,16f,16f,2f,2f,statetime*90)
+//        mgr!!.drawPal("_girl",0,0f,48f,48f,2f,2f,statetime*90)
+//        mgr!!.drawString("libmono","wubba lubba dub dub",Math.round(Math.sin(statetime*Math.PI/2)*64f+320f).toFloat(),Math.round(Math.cos(statetime*Math.PI/2)*64f+180f).toFloat(),1f,1f,0f,Vector2(0.5f,0.5f), mgr!!.palette[2])
+//        mgr!!.drawString("libmono","wubba lubba dub dub\n\n  grass tastes bad",Math.sin(statetime*Math.PI/2).toFloat()*64f+320f,Math.cos(statetime*Math.PI/2).toFloat()*64f+180f,2f,1f,statetime*-90,Vector2(0.5f,0.5f), mgr!!.palette[2])
+//        mgr!!.drawRgb("pacrt",statetime*3,320f,180f,1f,1f,statetime*-90f+90f)
 
-        mgr!!.stopBuffer()
-        mgr!!.clear()
-        mgr!!.drawBuffer("main",Math.sin(statetime*Math.PI/2).toFloat()*8f,0f)
-        mgr!!.flush()
     }
 
 
@@ -134,8 +113,10 @@ class ShootyShoot : ApplicationAdapter() {
         mgr?.newSpritePal("column","imgmap",30,4,2,2)
 
 
-        mgr?.newMapTilePal("sprites",241,4,"_column")
-//        mgr?.newMapTileRgb("sprites",241,"paclf")
+        mgr?.newMapTileRgb("sprites",241,"_greenblock")
+        mgr?.newMapTileRgb("sprites",242,"_skyblueblock")
+        mgr?.newMapTileRgb("sprites",243,"_whiteblock")
+        mgr?.newMapTileRgb("sprites",244,"_greyblock")
 
         audio?.newMusic("frcasio", "bgm/FriendlyCasiotone.ogg")
         audio?.newMusic("mkds", "bgm/mkdsintro.ogg", "bgm/mkds.ogg")

@@ -50,9 +50,11 @@ class MultiGfxRegister {
     private var shape: ShapeRenderer? = null
     private var shapetype: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Line
     private var status = DrawingState.off
+    private var scalarCurrent = 1f
 
     var camera = OrthographicCamera()
     var palette = Array<Color>()
+    var scalar = 1f
 
     fun newImagePal(key: String, uri: String, tw: Int, th: Int) {
         imagePal[key]?.dispose()
@@ -85,8 +87,8 @@ class MultiGfxRegister {
         fontsampling.put(key,sampling)
     }
 
-    fun newBuffer(key: String, width: Int, height: Int, camwidth: Float, camheight: Float, format: Pixmap.Format = Pixmap.Format.RGBA8888) {
-        buffers[key] = PixBuf(width,height,camwidth,camheight,format)
+    fun newBuffer(key: String, width: Int, height: Int, camwidth: Float, camheight: Float, scalar: Float = 1f, format: Pixmap.Format = Pixmap.Format.RGBA8888) {
+        buffers[key] = PixBuf(width,height,camwidth,camheight,scalar,format)
     }
 
     fun newMapTilePal(mapkey: String, id: Int, paloff: Short, anim: String, animH: String = "", animV:String = ", ", animHV:String = "", rotate: Boolean = false) {
@@ -228,12 +230,12 @@ class MultiGfxRegister {
 
     fun drawPal(anim: String, indexoffset: Short, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null) {
         drawingSprite()
-        if (batch != null) sequencePal[anim]?.draw(batch!!,palette,indexoffset,statetime,x,y,sw,sh,rot,center)
+        if (batch != null) sequencePal[anim]?.draw(batch!!,palette,indexoffset,statetime,x,y,sw*scalarCurrent,sh*scalarCurrent,rot,center?.scl(1/scalarCurrent))
     }
 
     fun drawRgb(anim: String, statetime: Float, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2? = null, col: Color = Color(1f,1f,1f,1f)) {
         drawingSprite()
-        if (batch != null) sequenceRgb[anim]?.draw(batch!!,statetime,x,y,sw,sh,rot,center, col)
+        if (batch != null) sequenceRgb[anim]?.draw(batch!!,statetime,x,y,sw*scalarCurrent,sh*scalarCurrent,rot,center?.scl(1/scalarCurrent), col)
     }
 
     fun drawString(f: String, str: String, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2(0.5f,0.5f), col: Color = Color(1f,1f,1f,1f)) {
@@ -243,8 +245,9 @@ class MultiGfxRegister {
     fun drawGlyphLayout(font: String, lay: GlyphLayout, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2(0.5f,0.5f), col: Color = Color(1f,1f,1f,1f)) {
         drawingSprite()
         val f = fonts[font]
-        val sampling = fontsampling[font]
+        var sampling = fontsampling[font]!!
         if (f != null && sampling!= null && batch != null) {
+            sampling *= scalarCurrent
             val begin = Vector2(x-lay.width*center.x,y+f.lineHeight+lay.height*center.y)
             val pages = f.regions
             val oldcol = batch!!.color
@@ -499,6 +502,20 @@ class MultiGfxRegister {
         return null
     }
 
+    fun setBufScalar(key: String, s: Float = 1f) {
+        val buf = buffers[key]
+        if (buf != null) {
+            buf.scalar = s
+            if (key == mybuf) scalarCurrent = s
+        }
+    }
+
+    fun getBufScalar(key:String): Float {
+        val buf = buffers[key]
+        if (buf != null) return buf.scalar
+        return 0f
+    }
+
     fun clear(r: Float = 0f, g: Float = 0f, b: Float = 0f, a: Float = 1f) {
         Gdx.gl.glClearColor(r,g,b,a)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -526,6 +543,7 @@ class MultiGfxRegister {
             buf.cam.update()
             batch!!.projectionMatrix = buf.cam.combined
             shape!!.projectionMatrix = buf.cam.combined
+            scalarCurrent = buf.scalar
         }
     }
 
@@ -536,6 +554,7 @@ class MultiGfxRegister {
             camera.update()
             batch!!.projectionMatrix = camera.combined
             shape!!.projectionMatrix = camera.combined
+            scalarCurrent = scalar
         }
     }
 
@@ -545,7 +564,7 @@ class MultiGfxRegister {
             drawingSprite()
             val oldcol = batch!!.color
             batch!!.color = col
-            batch!!.draw(TextureRegion(buf.tex),x,y,center.x,center.y,buf.tex.regionWidth.toFloat(),buf.tex.regionHeight.toFloat(),sw,sh,rot)
+            batch!!.draw(TextureRegion(buf.tex),x,y,center.x,center.y,buf.tex.regionWidth.toFloat(),buf.tex.regionHeight.toFloat(),sw*scalarCurrent,sh*scalarCurrent,rot)
             batch!!.color = oldcol
         }
     }
@@ -556,7 +575,7 @@ class MultiGfxRegister {
             drawingSprite()
             val oldcol = batch!!.color
             batch!!.color = col
-            batch!!.draw(TextureRegion(buf.tex,srcx,srcy,srcw,srch),x,y,center.x,center.y,buf.tex.regionWidth.toFloat(),buf.tex.regionHeight.toFloat(),sw,sh,rot)
+            batch!!.draw(TextureRegion(buf.tex,srcx,srcy,srcw,srch),x,y,center.x,center.y,buf.tex.regionWidth.toFloat(),buf.tex.regionHeight.toFloat(),sw*scalarCurrent,sh*scalarCurrent,rot)
             batch!!.color = oldcol
         }
     }
@@ -564,11 +583,11 @@ class MultiGfxRegister {
 
     fun drawTileLayer(layer: TiledMapTileLayer, key: String, unitScale: Float, statetime: Float, camin: OrthographicCamera? = null) {
         //this method is adapted from OrthogonalTiledMapRenderer.renderTileLayer(TiledMapTileLayer)
-        val layerWidth = layer.getWidth()
-        val layerHeight = layer.getHeight()
+        val layerWidth = layer.width
+        val layerHeight = layer.height
 
-        val layerTileWidth = layer.getTileWidth() * unitScale
-        val layerTileHeight = layer.getTileHeight() * unitScale
+        val layerTileWidth = layer.tileWidth * unitScale * scalarCurrent
+        val layerTileHeight = layer.tileHeight * unitScale * scalarCurrent
 
 
         var cam = camera
@@ -603,7 +622,7 @@ class MultiGfxRegister {
                     continue
                 }
 
-                maptrans[cell.tile?.id]?.draw(this,cell,statetime,x,y)
+                maptrans[cell.tile?.id]?.draw(this,cell,statetime,x,y,unitScale,unitScale)
 
                 x += layerTileWidth
             }

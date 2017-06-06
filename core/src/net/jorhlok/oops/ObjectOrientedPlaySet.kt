@@ -14,10 +14,9 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     var TileMap: MutableMap<String, TiledMap> = HashMap()
     var MasterScript: MutableMap<String, DungeonMaster> = HashMap()
     override var GlobalData: MutableMap<String, LabelledObject> = HashMap()
-    var FrameThreshold = 0.5f
+    var FrameThreshold = 0.25f
 
     //runtime
-    var DrawObj = LabelledObject()
     var Here: DungeonMaster? = null
 
     fun addTileMap(key: String, map: TiledMap) {
@@ -36,7 +35,7 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     }
 
     fun draw(deltatime: Float) {
-        if (Here != null) Here!!.draw(deltatime, DrawObj)
+        if (Here != null) Here!!.draw(deltatime)
     }
 
     override fun launchScript(key: String) {

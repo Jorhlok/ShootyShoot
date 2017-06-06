@@ -1,9 +1,9 @@
 package net.jorhlok.oops
 
-import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector2
 import java.util.LinkedList
 import java.util.Queue
 
@@ -20,30 +20,22 @@ open class DungeonMaster{
     //setup
     var MapName = ""
     var StrTerrain = "Terrain"
-//    var StrTileObjects = "TileObjects"
-//    var StrNonTiles = "NonTiles"
 
     //runtime
     var Parent: OOPS? = null
     var Level: TiledMap? = null
     var LyrTerrain: TiledMapTileLayer? = null
-//    var LyrTileObjects: TiledMapTileLayer? = null
-//    var LyrNonTiles: MapLayer? = null
     var Living: LinkedList<Entity> = LinkedList()
 
     constructor(mapname: String, terr: String? = null) {
         MapName = mapname
         if (terr != null) StrTerrain = terr
-//        if (tile != null) StrTileObjects = tile
-//        if (nontile != null) StrNonTiles = nontile
     }
 
     fun create(maps: Map<String, TiledMap>, parent: OOPS) {
         Parent = parent
         Level = maps[MapName]
         LyrTerrain = Level?.layers?.get(StrTerrain) as TiledMapTileLayer?
-//        LyrTileObjects = Level?.layers?.get(StrTileObjects) as TiledMapTileLayer?
-//        LyrNonTiles = Level?.layers?.get(StrNonTiles)
     }
 
     open fun begin() {}
@@ -112,7 +104,7 @@ open class DungeonMaster{
         }
     }
 
-    open fun draw(deltatime: Float, obj: LabelledObject) {
+    open fun draw(deltatime: Float) {
 
     }
 
@@ -127,18 +119,19 @@ open class DungeonMaster{
                 val c = LyrTerrain?.getCell(x, y)
                 if (c != null && c.tile != null) //TODO: px->world
                     q.add(LabelledObject("Tile",arrayOf(c,Rectangle(x.toFloat(),y.toFloat(),1f,1f)))) //LyrTerrain!!.tileWidth,LyrTerrain!!.tileHeight))))
-
-//                c = LyrTileObjects?.getCell(x, y)
-//                if (c != null && c.tile != null)
-//                    q.add(LabelledObject("TObj",arrayOf(c,Rectangle(x.toFloat(),y.toFloat(),LyrTileObjects!!.tileWidth,LyrTileObjects!!.tileHeight))))
             }
         }
-//        //collide with non-tiles
-//        val mapobj = LyrNonTiles?.objects?.getByType(RectangleMapObject::class.java)
-//        if (mapobj != null) for (r in mapobj) {
-//            if (aoi.overlaps(r.rectangle))
-//                q.add(LabelledObject("Non/${r.name}",r.rectangle))
-//        }
+    }
+
+    fun keepPointInBox(pt: Vector2, box: Rectangle): Vector2 {
+        var ret = Vector2(pt)
+        if (!box.contains(pt)) {
+            if (pt.x < box.x) ret.x = box.x
+            else if (pt.x > box.x + box.width) ret.x = box.x + box.width
+            if (pt.y < box.y) ret.y = box.y
+            else if (pt.y > box.y + box.height) ret.y = box.y + box.height
+        }
+        return ret
     }
 
 }

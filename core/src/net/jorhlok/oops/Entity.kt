@@ -42,7 +42,7 @@ open class Entity {
     open fun checkCollEntity(deltatime: Float, e: Entity) = false
     open fun checkCollTile(deltatime: Float, c: TiledMapTileLayer.Cell, x: Int, y: Int) = false
     open fun poststep(deltatime: Float) {}
-    open fun draw(deltatime: Float, obj: LabelledObject) {}
+    open fun draw(deltatime: Float) {}
     open fun end() {}
 
     fun doSimplePhysics(deltatime: Float) {

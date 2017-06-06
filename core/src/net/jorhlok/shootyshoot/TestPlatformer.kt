@@ -6,21 +6,29 @@ import net.jorhlok.multiav.MultiGfxRegister
 import net.jorhlok.oops.Entity
 import net.jorhlok.oops.LabelledObject
 
-class TestPlatformer : Entity() {
+class TestPlatformer(
+            var MGR: MultiGfxRegister,
+            var MAR: MultiAudioRegister) : Entity() {
     var Gravity = Vector2(0f, -20f)
     var Grounded = false
     var JumpVelo = 20f
+    var WalkVelo = 16f
+    var WalkAccl = 12f
 
     var jump = false
     var left = false
     var right = false
     var drawdir = false
-    var newjump = false
+
+    var wobbletime = 0f
+    val wobbledepth = 20f
+    val wobbleperiod = 0.25f
 
     init {
         AABB.set(0.125f, 0f, 0.75f, 1f)
         Tolerance.set(0.5f, 0.5f)
         Position.set(5f, 8f)
+        Friction.set(8f,0f)
         Physics = true
         CollTiles = true
         Type = "TestPlatformer"
@@ -42,7 +50,7 @@ class TestPlatformer : Entity() {
                             Velocity.add(0f, JumpVelo)
                             if (Velocity.y > JumpVelo) Velocity.y = JumpVelo
                             Grounded = false
-                            newjump = true
+                            MAR.playSFX("jump")
                         }
                     }
                     "CtrlLf" -> left = b
@@ -50,52 +58,44 @@ class TestPlatformer : Entity() {
                 }
 
                 if (left && !right) {
-                    Velocity.x = -8f
+                    Velocity.x -= WalkAccl * deltatime
+                    if (Velocity.x < -1*WalkVelo) Velocity.x = -1*WalkVelo
                     drawdir = false
                 } else if (right && !left) {
-                    Velocity.x = 8f
+                    Velocity.x += WalkAccl * deltatime
+                    if (Velocity.x > WalkVelo) Velocity.x = WalkVelo
                     drawdir = true
-                } else
-                    Velocity.x = 0f
+                }
             }
         }
         Mailbox.clear()
     }
 
-//    override fun step(deltatime: Float) {
-//        val len = CollisionTiles.size
-//        //ignore non-tiles
-//        for (i in 0..len - 1) {
-//            val tmp = CollisionTiles.poll()
-//            if (tmp != null && tmp.cell != null) {
-//                CollisionTiles.add(tmp)
-//            }
-//        }
-//    }
-
     override fun poststep(deltatime: Float) {
         if (Velocity.y < 0)
             Grounded = false
         else if (Velocity.y == 0f) Grounded = true
-        for (m in Mailbox) {
-            System.out.println(m.label)
-        }
+//        for (m in Mailbox) {
+//            System.out.println(m.label)
+//        }
     }
 
-    override fun draw(deltatime: Float, obj: LabelledObject) {
-        var o = obj.obj as Array<Any>
-        var mgr = o[0] as MultiGfxRegister
-        var mar = o[1] as MultiAudioRegister
-        if (drawdir) {
-            mgr?.drawRgb("_gunrt", 0f, (Position.x + 0.75f) * 16, Position.y * 16,1f,1f,0f,Vector2())
-            mgr?.drawRgb("_guyrt", 0f, Position.x * 16, Position.y * 16,1f,1f,0f,Vector2())
-        } else {
-            mgr?.drawRgb("_gunlf", 0f, (Position.x - 0.75f) * 16, Position.y * 16,1f,1f,0f,Vector2())
-            mgr?.drawRgb("_guylf", 0f, Position.x * 16, Position.y * 16,1f,1f,0f,Vector2())
+    override fun draw(deltatime: Float) {
+        var rot = 0f
+        if (Velocity.x != 0f) {
+            wobbletime += deltatime*Velocity.x/WalkVelo
+            if (wobbletime > wobbleperiod) wobbletime -= wobbleperiod
+            rot = Math.sin(wobbletime/wobbleperiod*2*Math.PI).toFloat()*wobbledepth
+            if (Velocity.x > 0) rot *= -1
         }
-        if (newjump) {
-            newjump = false
-            mar.playSFX("jump")
+        else wobbletime = 0f
+
+        if (drawdir) {
+            MGR.drawRgb("_guyrt", 0f, Position.x + 0.5f, Position.y,1f,1f,rot,Vector2(0.5f,0f))
+            MGR.drawRgb("_gunrt", 0f, Position.x + 10/16f, Position.y,1f,1f,0f,Vector2())
+        } else {
+            MGR.drawRgb("_guylf", 0f, Position.x + 0.5f, Position.y,1f,1f,rot,Vector2(0.5f,0f))
+            MGR.drawRgb("_gunlf", 0f, Position.x - 10/16f, Position.y,1f,1f,0f,Vector2())
         }
     }
 

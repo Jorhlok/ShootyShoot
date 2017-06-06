@@ -13,7 +13,8 @@ class PixBuf (width: Int,
               height: Int,
               camwidth: Float,
               camheight: Float,
-              format: Pixmap.Format) {
+              var scalar: Float = 1f,
+              format: Pixmap.Format = Pixmap.Format.RGBA8888) {
     var drawing = false
     var fb = FrameBuffer(format,width,height,false)
     var tex = TextureRegion(fb.colorBufferTexture)
