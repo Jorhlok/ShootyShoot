@@ -20,30 +20,30 @@ open class DungeonMaster{
     //setup
     var MapName = ""
     var StrTerrain = "Terrain"
-    var StrTileObjects = "TileObjects"
-    var StrNonTiles = "NonTiles"
+//    var StrTileObjects = "TileObjects"
+//    var StrNonTiles = "NonTiles"
 
     //runtime
     var Parent: OOPS? = null
     var Level: TiledMap? = null
     var LyrTerrain: TiledMapTileLayer? = null
-    var LyrTileObjects: TiledMapTileLayer? = null
-    var LyrNonTiles: MapLayer? = null
-    var Living: List<Entity> = LinkedList()
+//    var LyrTileObjects: TiledMapTileLayer? = null
+//    var LyrNonTiles: MapLayer? = null
+    var Living: LinkedList<Entity> = LinkedList()
 
-    constructor(mapname: String, terr: String? = null, tile: String? = null, nontile: String? = null) {
+    constructor(mapname: String, terr: String? = null) {
         MapName = mapname
         if (terr != null) StrTerrain = terr
-        if (tile != null) StrTileObjects = tile
-        if (nontile != null) StrNonTiles = nontile
+//        if (tile != null) StrTileObjects = tile
+//        if (nontile != null) StrNonTiles = nontile
     }
 
     fun create(maps: Map<String, TiledMap>, parent: OOPS) {
         Parent = parent
         Level = maps[MapName]
         LyrTerrain = Level?.layers?.get(StrTerrain) as TiledMapTileLayer?
-        LyrTileObjects = Level?.layers?.get(StrTileObjects) as TiledMapTileLayer?
-        LyrNonTiles = Level?.layers?.get(StrNonTiles)
+//        LyrTileObjects = Level?.layers?.get(StrTileObjects) as TiledMapTileLayer?
+//        LyrNonTiles = Level?.layers?.get(StrNonTiles)
     }
 
     open fun begin() {}
@@ -60,27 +60,29 @@ open class DungeonMaster{
 
         //check for collisions with entities
         //check for collisions with tiles if they wish and engage mid-step if they need it
-        var q: Queue<LabelledObject> = LinkedList()
-        var iter = Living.listIterator()
+        val q: Queue<LabelledObject> = LinkedList()
+        val iter = Living.listIterator()
         while (iter.hasNext()) { //everybody handshake  sum(1..n)  n(n-1)/2  O(n^2)
             val obj = iter.next()
             if (obj.CollEntities) {
                 iter.forEachRemaining { e ->
                     if (e.CollEntities && e.AOI.overlaps(obj.AOI)) {
-                        if (obj.CollEntWhite != null && e.Type in obj.CollEntWhite!! ||
-                                obj.CollEntGray != null && e.Type in obj.CollEntGray!!
+                        if (obj.CollEntWhite == null && obj.CollEntGray == null ||
+                                obj.CollEntWhite != null && e.Type in obj.CollEntWhite!! ||
+                                    obj.CollEntGray != null && e.Type in obj.CollEntGray!!
                                         && obj.checkCollEntity(deltatime,e)) {
                             obj.Mailbox.add(LabelledObject("CollEnt/${e.Type}", e))
                             if (obj.CollEntAsTile != null && e.Type in obj.CollEntAsTile!!)
-                                obj.CollQueue.add(LabelledObject("Ent",e))
+                                obj.CollQueue.add(LabelledObject("Ent/${e.Type}",e))
                         }
 
-                        if (e.CollEntWhite != null && obj.Type in e.CollEntWhite!! ||
-                                e.CollEntGray != null && obj.Type in e.CollEntGray!!
+                        if (e.CollEntWhite == null && e.CollEntGray == null ||
+                                e.CollEntWhite != null && obj.Type in e.CollEntWhite!! ||
+                                    e.CollEntGray != null && obj.Type in e.CollEntGray!!
                                         && e.checkCollEntity(deltatime,obj)) {
                             e.Mailbox.add(LabelledObject("CollEnt/${obj.Type}", obj))
                             if (e.CollEntAsTile != null && obj.Type in e.CollEntAsTile!!)
-                                e.CollQueue.add(LabelledObject("Ent",e))
+                                e.CollQueue.add(LabelledObject("Ent/${obj.Type}",e))
                         }
                     }
                 }
@@ -88,13 +90,14 @@ open class DungeonMaster{
             if (obj.CollTiles) {
                 CollectTiles(q, obj.AOI)
                 for (o in q) {
-                    val tile = o.obj as List<Any?>
+                    val tile = o.obj as Array<Any>
                     val c = tile[0] as TiledMapTileLayer.Cell
                     val r = tile[1] as Rectangle
-                    if (obj.CollTileWhite != null && c.tile.id in obj.CollTileWhite!! ||
-                            obj.CollTileGray != null && c.tile.id in obj.CollTileGray!! &&
+                    if (obj.CollTileWhite == null && obj.CollTileGray == null ||
+                            obj.CollTileWhite != null && c.tile.id in obj.CollTileWhite!! ||
+                                obj.CollTileGray != null && c.tile.id in obj.CollTileGray!! &&
                                     obj.checkCollTile(deltatime,c,r.x.toInt(),r.y.toInt()))
-                        obj.CollQueue.add(LabelledObject("${o.label}/${c.tile.id}",Rectangle(r)))
+                        obj.CollQueue.add(LabelledObject("Tile/${c.tile.id}",r))
                 }
                 q.clear()
             }
@@ -121,13 +124,13 @@ open class DungeonMaster{
         //collide with tiles
         for (y in y1..y2) {
             for (x in x1..x2) {
-                var c = LyrTerrain?.getCell(x, y)
-                if (c != null && c.tile != null)
-                    q.add(LabelledObject("Tile",arrayOf(c,Rectangle(x.toFloat(),y.toFloat(),LyrTerrain!!.tileWidth,LyrTerrain!!.tileHeight))))
+                val c = LyrTerrain?.getCell(x, y)
+                if (c != null && c.tile != null) //TODO: px->world
+                    q.add(LabelledObject("Tile",arrayOf(c,Rectangle(x.toFloat(),y.toFloat(),1f,1f)))) //LyrTerrain!!.tileWidth,LyrTerrain!!.tileHeight))))
 
-                c = LyrTileObjects?.getCell(x, y)
-                if (c != null && c.tile != null)
-                    q.add(LabelledObject("TObj",arrayOf(c,Rectangle(x.toFloat(),y.toFloat(),LyrTileObjects!!.tileWidth,LyrTileObjects!!.tileHeight))))
+//                c = LyrTileObjects?.getCell(x, y)
+//                if (c != null && c.tile != null)
+//                    q.add(LabelledObject("TObj",arrayOf(c,Rectangle(x.toFloat(),y.toFloat(),LyrTileObjects!!.tileWidth,LyrTileObjects!!.tileHeight))))
             }
         }
 //        //collide with non-tiles

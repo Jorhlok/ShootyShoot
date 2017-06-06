@@ -42,111 +42,95 @@ open class Entity {
     open fun checkCollEntity(deltatime: Float, e: Entity) = false
     open fun checkCollTile(deltatime: Float, c: TiledMapTileLayer.Cell, x: Int, y: Int) = false
     open fun poststep(deltatime: Float) {}
-    open fun draw(obj: LabelledObject) {}
+    open fun draw(deltatime: Float, obj: LabelledObject) {}
     open fun end() {}
 
     fun doSimplePhysics(deltatime: Float) {
-        PrePosition.set(Position)
         if (Physics) {
-            PreVelocity.set(Velocity)
-            //apply velocity
-            Position.add(Velocity.cpy().scl(deltatime))
-            //apply friction
-            if (Velocity.x > 0) {
-                Velocity.x -= Friction.x * deltatime
-                if (Velocity.x < 0) Velocity.x = 0f
-            } else if (Velocity.x < 0) {
-                Velocity.x += Friction.x * deltatime
-                if (Velocity.x > 0) Velocity.x = 0f
-            }
-            if (Velocity.y > 0) {
-                Velocity.y -= Friction.y * deltatime
-                if (Velocity.y < 0) Velocity.y = 0f
-            } else if (Velocity.y < 0) {
-                Velocity.y += Friction.y * deltatime
-                if (Velocity.y > 0) Velocity.y = 0f
+            PrePosition.set(Position)
+            if (Physics) {
+                PreVelocity.set(Velocity)
+                //apply velocity
+                Position.add(Velocity.cpy().scl(deltatime))
+                //apply friction
+                if (Velocity.x > 0) {
+                    Velocity.x -= Friction.x * deltatime
+                    if (Velocity.x < 0) Velocity.x = 0f
+                } else if (Velocity.x < 0) {
+                    Velocity.x += Friction.x * deltatime
+                    if (Velocity.x > 0) Velocity.x = 0f
+                }
+                if (Velocity.y > 0) {
+                    Velocity.y -= Friction.y * deltatime
+                    if (Velocity.y < 0) Velocity.y = 0f
+                } else if (Velocity.y < 0) {
+                    Velocity.y += Friction.y * deltatime
+                    if (Velocity.y > 0) Velocity.y = 0f
+                }
             }
         }
-        AOI.setPosition(PrePosition).setSize(AABB.width,AABB.height)
+        AOI.setPosition(PrePosition).setSize(AABB.width,AABB.height).merge(Rectangle(AABB).setPosition(Position))
     }
 
     fun collideWithTiles(deltaTime: Float) {
-        if (Physics) {
-            //do tile collisions
-//            var len = CollisionTiles.size
-//            CollisionFlags = 0
-            val vRect = Rectangle(AABB.x + Position.x + AABB.width * Tolerance.x / 2, AABB.y + Position.y,
-                    AABB.width * Tolerance.x, AABB.height)
-            val hRect = Rectangle(AABB.x + Position.x, AABB.y + Position.y + AABB.height * Tolerance.y / 2,
-                    AABB.width, AABB.height * Tolerance.y)
+        if (Physics && CollQueue.isNotEmpty()) {
+            var len = CollQueue.size
+            PrePosition.set(Position)
 
-            //first pass
-//            for (i in 0..len - 1) {
-//                val t = CollisionTiles.poll()
-//                t.CollisionFlags = 0
-//                if (t.AABB.overlaps(vRect)) {
-//                    //check if it's a bottom hit or a top hit
-//                    val tHi = t.AABB.y + t.AABB.height
-//                    val pHi = vRect.y + vRect.height
-//                    val up = pHi - tHi
-//                    val down = t.AABB.y - vRect.y
-//                    if (getVelocity().y < 0 || getVelocity().y >= 0 && up >= 0) t.CollisionFlags = t.CollisionFlags or 8
-//                    if (getVelocity().y > 0 || getVelocity().y <= 0 && down >= 0) t.CollisionFlags = t.CollisionFlags or 4
-//                    if (!t.CollisionUp() && !t.CollisionDown()) t.CollisionFlags = t.CollisionFlags or 8 + 4
-//                    CollisionFlags = CollisionFlags or t.CollisionFlags
-//                }
-//                if (t.AABB.overlaps(hRect)) {
-//                    //check if it's a left hit or a right hit
-//                    val tRi = t.AABB.x + t.AABB.width
-//                    val pRi = hRect.x + hRect.width
-//                    val left = t.AABB.x - hRect.x
-//                    val right = pRi - tRi
-//                    if (getVelocity().x > 0 || getVelocity().x <= 0 && left >= 0) t.CollisionFlags = t.CollisionFlags or 2
-//                    if (getVelocity().x < 0 || getVelocity().x >= 0 && right >= 0) t.CollisionFlags = t.CollisionFlags or 1
-//                    if (!t.CollisionLeft() && !t.CollisionRight()) t.CollisionFlags = t.CollisionFlags or 2 + 1
-//                    CollisionFlags = CollisionFlags or t.CollisionFlags
-//                }
-//                CollisionTiles.add(t)
-//            }
-
-            //second pass
-//            for (j in 0..1) {
-//                len = CollisionTiles.size
-//                for (i in 0..len - 1) {
-//                    //this removes non-colliders and finds where things are pushing this
-//
-//                    val t = CollisionTiles.poll()
-//                    if (t.CollisionFlags !== 0) {
-//                        CollisionTiles.add(t)
-//                        //adjust position if it still overlaps
-//                        if (t.AABB.overlaps(Rectangle(getAABB()).setPosition(getPosition().cpy().add(getAABB().x, getAABB().y)))) {
-//                            if (j == 0 && VerticalFirst || j == 1 && !VerticalFirst) {
-//                                //vertical shunting
-//                                if (t.CollisionUp() && !t.CollisionDown()) {
-//                                    //top of block
-//                                    getPosition().y += t.AABB.y + t.AABB.height - (getPosition().y + getAABB().y)
-//                                    getVelocity().y = 0
-//                                } else if (t.CollisionDown() && !t.CollisionUp()) {
-//                                    //bottom of block
-//                                    getPosition().y -= getPosition().y + getAABB().y + getAABB().height - t.AABB.y
-//                                    getVelocity().y = 0
-//                                }
-//                            } else {
-//                                //horizontal shunting
-//                                if (t.CollisionRight() && !t.CollisionLeft()) {
-//                                    //right side of block
-//                                    getPosition().x += t.AABB.x + t.AABB.width - (getPosition().x + getAABB().x)
-//                                    getVelocity().x = 0
-//                                } else if (t.CollisionLeft() && !t.CollisionRight()) {
-//                                    //left side of block
-//                                    getPosition().x -= getPosition().x + getAABB().x + getAABB().width - t.AABB.x
-//                                    getVelocity().x = 0
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            //check tiles for collisions and make adjustments
+            for (j in 0..1) {
+                if (VerticalFirst && j == 0 || !VerticalFirst && j == 1) {
+                    for (i in 0..len-1) {
+                        var r = Rectangle()
+                        val t = CollQueue.poll()
+                        CollQueue.add(t)
+                        when {
+                            t.label.startsWith("Ent") -> {
+                                val e = (t.obj as Entity)
+                                r = Rectangle(e.Position.x+e.AABB.x,e.Position.y+e.AABB.y,e.AABB.width,e.AABB.height)
+                            }
+                            t.label.startsWith("Tile") -> {r = t.obj as Rectangle}
+                        }
+                        val vRect = mkVRect(AABB,Position,Tolerance)
+                        if (r.overlaps(vRect)) {
+                            if (vRect.y+vRect.height/2 >= r.y+r.height/2) { //falling down, shunt up
+                                Position.add(0f, r.y + r.height - Position.y - AABB.y)
+                                Mailbox.add((LabelledObject("BumpUp/${t.label}",r)))
+                            }
+                            else { //rising up, shunt down
+                                Position.sub(0f, Position.y + AABB.y + AABB.height - r.y)
+                                Mailbox.add((LabelledObject("BumpDn/${t.label}",r)))
+                            }
+                            Velocity.y = 0f
+                        }
+                    }
+                } else {
+                    for (i in 0..len-1) {
+                        var r = Rectangle()
+                        val t = CollQueue.poll()
+                        CollQueue.add(t)
+                        when {
+                            t.label.startsWith("Ent") -> {r = (t.obj as Entity).AABB.setPosition((t.obj as Entity).Position)}
+                            t.label.startsWith("Tile") -> {r = t.obj as Rectangle}
+                        }
+                        val hRect = mkHRect(AABB,Position,Tolerance)
+                        if (r.overlaps(hRect)) {
+                            if (hRect.x+hRect.width/2 >= r.x+r.width/2) { //moving left, shunt right
+                                Position.add(r.x + r.width - Position.x - AABB.x, 0f)
+                                Mailbox.add((LabelledObject("BumpRt/${t.label}")))
+                            }
+                            else { //moving right, shunt left
+                                Position.sub(Position.x + AABB.x + AABB.width - r.x, 0f)
+                                Mailbox.add((LabelledObject("BumpLf/${t.label}")))
+                            }
+                            Velocity.x = 0f
+                        }
+                    }
+                }
+            }
         }
     }
+
+    fun mkVRect (aabb: Rectangle, pos: Vector2, tol: Vector2) = Rectangle(aabb.x + pos.x + aabb.width * tol.x / 2, aabb.y + pos.y, aabb.width * tol.x, aabb.height)
+    fun mkHRect (aabb: Rectangle, pos: Vector2, tol: Vector2) = Rectangle(aabb.x + pos.x, aabb.y + pos.y + aabb.height * tol.y / 2, aabb.width, aabb.height * tol.y)
 }

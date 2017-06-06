@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
+import net.jorhlok.oops.LabelledObject
 import net.jorhlok.oops.ObjectOrientedPlaySet
 
 
@@ -44,17 +45,16 @@ class ShootyShoot : ApplicationAdapter() {
         audio!!.setSFXVolume(0.25f)
 
         oops = ObjectOrientedPlaySet()
-        oops!!.DrawObj = mgr
+        oops!!.DrawObj = LabelledObject("MultiAV",arrayOf(mgr,audio))
         oops!!.addTileMap("test0", TmxMapLoader(InternalFileHandleResolver()).load("map/test0.tmx"))
         oops!!.addTileMap("test1", TmxMapLoader(InternalFileHandleResolver()).load("map/test1.tmx"))
-        oops!!.addEntityType("testplat", TestPlatformer::class.java)
 
-        val dm = TestDM("test1", null)
+        val dm = TestDM("test1")
 //        dm.cam = mgr!!.getBufCam("main")
         oops!!.addMasterScript("testdm", dm)
         oops!!.launchScript("testdm")
-        var m = audio?.getMus("frcasio")
-        m?.Generate()
+//        var m = audio?.getMus("frcasio")
+//        m?.Generate()
 //        m?.play(true)
     }
 
@@ -68,13 +68,12 @@ class ShootyShoot : ApplicationAdapter() {
             statetime -= 4f
             val f = 1f
             mgr!!.palette[2].set(Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,Math.round(Math.random()*f).toFloat()/f,1f)
-//            audio?.playSFX("pew")
-            when (Math.round(Math.random()*3).toInt()) {
-                1 -> audio?.playSFX("pew")
-                2 -> audio?.playSFX("jump")
-                3 -> audio?.playSFX("dash")
-                else -> audio?.playSFX("growl")
-            }
+//            when (Math.round(Math.random()*3).toInt()) {
+//                1 -> audio?.playSFX("pew")
+//                2 -> audio?.playSFX("jump")
+//                3 -> audio?.playSFX("dash")
+//                else -> audio?.playSFX("growl")
+//            }
         }
 
 //        val c = mgr!!.getBufCam("main")
