@@ -23,8 +23,8 @@ class TestPlatformer(
     val wobbledepth = 20f
     val wobbleperiod = 0.25f
 
-    val tolup = 2/10f
-    val toldn = 4/10f
+    val tolup = 0.5f/10f
+    val toldn = 0.5f/10f
 
     init {
         AABB.set(3/16f, 0f, 10/16f, 14/16f)

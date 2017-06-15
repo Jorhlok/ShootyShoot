@@ -14,7 +14,7 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     var TileMap: MutableMap<String, TiledMap> = HashMap()
     var MasterScript: MutableMap<String, DungeonMaster> = HashMap()
     override var GlobalData: MutableMap<String, LabelledObject> = HashMap()
-    var FrameThreshold = 0.25f
+    var FrameThreshold = 0.05f
 
     //runtime
     var Here: DungeonMaster? = null
@@ -30,8 +30,11 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
 
     fun step(deltatime: Float) {
         if (deltatime < FrameThreshold) Here?.update(deltatime)
-        else System.err.println("Whoa, a frame took ${deltatime}s which is waaaaay longer than the threshold of ${FrameThreshold}.\n" +
-                "Physics surely would have broken down had I let this frame run.")
+        else {
+            Here?.update(FrameThreshold)
+            System.err.println("Whoa, a frame took ${deltatime}s which is waaaaay longer than the threshold of ${FrameThreshold}s.\n" +
+                    "Physics surely would have broken down had I let this frame run.")
+        }
     }
 
     fun draw(deltatime: Float) {
