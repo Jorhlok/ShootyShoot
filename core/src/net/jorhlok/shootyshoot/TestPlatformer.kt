@@ -4,16 +4,15 @@ import com.badlogic.gdx.math.Vector2
 import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
 import net.jorhlok.oops.Entity
-import net.jorhlok.oops.LabelledObject
 
 class TestPlatformer(
             var MGR: MultiGfxRegister,
             var MAR: MultiAudioRegister) : Entity() {
-    var Gravity = Vector2(0f, -20f)
+    var Gravity = Vector2(0f, -24f)
     var Grounded = false
-    var JumpVelo = 20f
+    var JumpVelo = 24f
     var WalkVelo = 16f
-    var WalkAccl = 12f
+    var WalkAccl = 16f
 
     var jump = false
     var left = false
@@ -24,11 +23,14 @@ class TestPlatformer(
     val wobbledepth = 20f
     val wobbleperiod = 0.25f
 
+    val tolup = 2/10f
+    val toldn = 4/10f
+
     init {
-        AABB.set(0.125f, 0f, 0.75f, 1f)
-        Tolerance.set(0.5f, 0.5f)
+        AABB.set(3/16f, 0f, 10/16f, 14/16f)
+        Tolerance.set(2/10f, 10/14f)
         Position.set(5f, 8f)
-        Friction.set(8f,0f)
+        Friction.set(16f,0f)
         Physics = true
         CollTiles = true
         Type = "TestPlatformer"
@@ -68,6 +70,11 @@ class TestPlatformer(
                 }
             }
         }
+
+        //easier to snap moving upward than downward
+        if (Velocity.y > 0) Tolerance.x = tolup
+        else Tolerance.x = toldn
+
         Mailbox.clear()
     }
 
@@ -85,8 +92,7 @@ class TestPlatformer(
         if (Velocity.x != 0f) {
             wobbletime += deltatime*Velocity.x/WalkVelo
             if (wobbletime > wobbleperiod) wobbletime -= wobbleperiod
-            rot = Math.sin(wobbletime/wobbleperiod*2*Math.PI).toFloat()*wobbledepth
-            if (Velocity.x > 0) rot *= -1
+            rot = Math.sin(wobbletime/wobbleperiod*2*Math.PI).toFloat()*wobbledepth*-1
         }
         else wobbletime = 0f
 

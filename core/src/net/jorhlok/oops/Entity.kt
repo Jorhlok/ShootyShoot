@@ -46,8 +46,9 @@ open class Entity {
     open fun end() {}
 
     fun doSimplePhysics(deltatime: Float) {
+        AOI.set(mkRect())
+        PrePosition.set(Position)
         if (Physics) {
-            PrePosition.set(Position)
             if (Physics) {
                 PreVelocity.set(Velocity)
                 //apply velocity
@@ -69,7 +70,7 @@ open class Entity {
                 }
             }
         }
-        AOI.setPosition(PrePosition).setSize(AABB.width,AABB.height).merge(Rectangle(AABB).setPosition(Position))
+        AOI.merge(mkRect())
     }
 
     fun collideWithTiles(deltaTime: Float) {
@@ -85,13 +86,10 @@ open class Entity {
                         val t = CollQueue.poll()
                         CollQueue.add(t)
                         when {
-                            t.label.startsWith("Ent") -> {
-                                val e = (t.obj as Entity)
-                                r = Rectangle(e.Position.x+e.AABB.x,e.Position.y+e.AABB.y,e.AABB.width,e.AABB.height)
-                            }
-                            t.label.startsWith("Tile") -> {r = t.obj as Rectangle}
+                            t.label.startsWith("Ent") -> r = (t.obj as Entity).mkRect()
+                            t.label.startsWith("Tile") -> r = t.obj as Rectangle
                         }
-                        val vRect = mkVRect(AABB,Position,Tolerance)
+                        val vRect = mkVRect()
                         if (r.overlaps(vRect)) {
                             if (vRect.y+vRect.height/2 >= r.y+r.height/2) { //falling down, shunt up
                                 Position.add(0f, r.y + r.height - Position.y - AABB.y)
@@ -110,10 +108,10 @@ open class Entity {
                         val t = CollQueue.poll()
                         CollQueue.add(t)
                         when {
-                            t.label.startsWith("Ent") -> {r = (t.obj as Entity).AABB.setPosition((t.obj as Entity).Position)}
-                            t.label.startsWith("Tile") -> {r = t.obj as Rectangle}
+                            t.label.startsWith("Ent") -> r = (t.obj as Entity).mkRect()
+                            t.label.startsWith("Tile") -> r = t.obj as Rectangle
                         }
-                        val hRect = mkHRect(AABB,Position,Tolerance)
+                        val hRect = mkHRect()
                         if (r.overlaps(hRect)) {
                             if (hRect.x+hRect.width/2 >= r.x+r.width/2) { //moving left, shunt right
                                 Position.add(r.x + r.width - Position.x - AABB.x, 0f)
@@ -131,6 +129,21 @@ open class Entity {
         }
     }
 
-    fun mkVRect (aabb: Rectangle, pos: Vector2, tol: Vector2) = Rectangle(aabb.x + pos.x + aabb.width * tol.x / 2, aabb.y + pos.y, aabb.width * tol.x, aabb.height)
-    fun mkHRect (aabb: Rectangle, pos: Vector2, tol: Vector2) = Rectangle(aabb.x + pos.x, aabb.y + pos.y + aabb.height * tol.y / 2, aabb.width, aabb.height * tol.y)
+    fun mkRect() = mkRect(AABB,Position)
+
+    fun mkVRect() = mkVRect(mkRect(),Tolerance)
+
+    fun mkHRect() = mkHRect(mkRect(),Tolerance)
+
+    fun mkRect(aabb: Rectangle, pos: Vector2) = Rectangle(aabb.x+pos.x,aabb.y+pos.y,aabb.width,aabb.height)
+
+    fun mkVRect(aabb: Rectangle, tol: Vector2) = Rectangle(aabb.x + (aabb.width - aabb.width * tol.x) / 2,
+                                                            aabb.y,
+                                                            aabb.width * tol.x,
+                                                            aabb.height)
+
+    fun mkHRect(aabb: Rectangle, tol: Vector2) = Rectangle(aabb.x,
+                                                            aabb.y + (aabb.height - aabb.height * tol.y) / 2,
+                                                            aabb.width,
+                                                            aabb.height * tol.y)
 }

@@ -50,8 +50,7 @@ open class DungeonMaster{
         for (e in Living) e.prestep(deltatime)
         for (e in Living) e.doSimplePhysics(deltatime)
 
-        //check for collisions with entities
-        //check for collisions with tiles if they wish and engage mid-step if they need it
+        //check for collisions with entities/tiles if they wish and engage mid-step if they need it
         val q: Queue<LabelledObject> = LinkedList()
         val iter = Living.listIterator()
         while (iter.hasNext()) { //everybody handshake  sum(1..n)  n(n-1)/2  O(n^2)
