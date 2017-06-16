@@ -56,7 +56,7 @@ open class DungeonMaster{
         while (iter.hasNext()) { //everybody handshake  sum(1..n)  n(n-1)/2  O(n^2)
             val obj = iter.next()
             if (obj.CollEntities) {
-                iter.forEachRemaining { e ->
+                Living.listIterator(iter.nextIndex()).forEachRemaining { e ->
                     if (e.CollEntities && e.AOI.overlaps(obj.AOI)) {
                         if (obj.CollEntWhite == null && obj.CollEntGray == null ||
                                 obj.CollEntWhite != null && e.Type in obj.CollEntWhite!! ||
@@ -73,7 +73,7 @@ open class DungeonMaster{
                                         && e.checkCollEntity(deltatime,obj)) {
                             e.Mailbox.add(LabelledObject("CollEnt/${obj.Type}", obj))
                             if (e.CollEntAsTile != null && obj.Type in e.CollEntAsTile!!)
-                                e.CollQueue.add(LabelledObject("Ent/${obj.Type}",e))
+                                e.CollQueue.add(LabelledObject("Ent/${obj.Type}",obj))
                         }
                     }
                 }

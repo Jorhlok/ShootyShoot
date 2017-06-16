@@ -3,6 +3,7 @@ package net.jorhlok.shootyshoot
 import com.badlogic.gdx.math.Vector2
 import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
+import net.jorhlok.oops.Entity
 
 class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(MGR, MAR) {
     var Gravity = Vector2(0f, -24f)
@@ -15,6 +16,7 @@ class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(
     var left = false
     var right = false
     var drawdir = false
+    var forcefall = false
 
     var wobbletime = 0f
     val wobbledepth = 20f
@@ -30,6 +32,11 @@ class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(
         Friction.set(16f,0f)
         Physics = true
         CollTiles = true
+        CollEntities = true
+        val s = HashSet<String>()
+        s.add(ThruPlat.TypeName)
+        CollEntAsTile = s
+        CollEntGray = s
         Type = "TestPlatformer"
     }
 
@@ -54,6 +61,7 @@ class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(
                     }
                     "CtrlLf" -> left = b
                     "CtrlRt" -> right = b
+                    "CtrlDn" -> forcefall = b
                 }
 
                 if (left && !right) {
@@ -82,6 +90,13 @@ class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(
 //        for (m in Mailbox) {
 //            System.out.println(m.label)
 //        }
+    }
+
+    override fun checkCollEntity(deltatime: Float, e: Entity): Boolean {
+        when(e.Type) {
+            ThruPlat.TypeName -> return !forcefall && Velocity.y <= 0 && Position.y >= e.Position.y && mkVRect().overlaps(e.mkRect())
+        }
+        return false
     }
 
     override fun draw(deltatime: Float) {

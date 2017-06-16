@@ -19,8 +19,8 @@ class TestDM(mapname: String,
     var Player: TestPlatformer? = null
 
     override fun begin() {
-        val LyrTileObj = Level!!.layers["TileObjects"] as TiledMapTileLayer
-        for (y in 0..LyrTileObj.height-1)
+        val LyrTileObj = Level!!.layers["TileObjects"] as TiledMapTileLayer?
+        if (LyrTileObj != null) for (y in 0..LyrTileObj.height-1)
             for (x in 0..LyrTileObj.width-1) {
                 val obj = LyrTileObj.getCell(x,y)
 //                System.out.println("${obj?.tile?.id}")
@@ -66,21 +66,26 @@ class TestDM(mapname: String,
     }
 
     override fun prestep(deltaTime: Float) {
-            if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.UP)
-                    || Gdx.input.isKeyPressed(Input.Keys.W))
-                Player!!.Mailbox.add(LabelledObject("CtrlJump",true))
-            else
-                Player!!.Mailbox.add(LabelledObject("CtrlJump",false))
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.UP)
+                || Gdx.input.isKeyPressed(Input.Keys.W))
+            Player!!.Mailbox.add(LabelledObject("CtrlJump",true))
+        else
+            Player!!.Mailbox.add(LabelledObject("CtrlJump",false))
 
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D))
-                Player!!.Mailbox.add(LabelledObject("CtrlRt",true))
-            else
-                Player!!.Mailbox.add(LabelledObject("CtrlRt",false))
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D))
+            Player!!.Mailbox.add(LabelledObject("CtrlRt",true))
+        else
+            Player!!.Mailbox.add(LabelledObject("CtrlRt",false))
 
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A))
-                Player!!.Mailbox.add(LabelledObject("CtrlLf",true))
-            else
-                Player!!.Mailbox.add(LabelledObject("CtrlLf",false))
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A))
+            Player!!.Mailbox.add(LabelledObject("CtrlLf",true))
+        else
+            Player!!.Mailbox.add(LabelledObject("CtrlLf",false))
+
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S))
+            Player!!.Mailbox.add(LabelledObject("CtrlDn",true))
+        else
+            Player!!.Mailbox.add(LabelledObject("CtrlDn",false))
     }
 
     override fun draw(deltatime: Float) {

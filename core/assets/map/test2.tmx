@@ -12,12 +12,12 @@
  </objectgroup>
  <layer name="Terrain" width="80" height="45">
   <data encoding="base64" compression="zlib">
-   eJztmusOgyAMRnn/tzXbAyxLtmQ6UOHj0jbnJP0plqPYim4ppY2QAtrAnwb+NPCngT+NiP6ov37An0bJ3/MQvVDHtLZ2LOTgGfxp4E8Dfxr4+6emdlr1Z6nGnmE9P+vgT2O2v9FrclTfX6LHXGbnbAnWrwb+NPCnYcGfhz6vhJe8e9ao41jKeF78WQV/GvjTuNq/H3GuSNcr2nxmg789tXU5kj+lH8n1NHfGW+3PwjPx6+jxiRqHSu4R9l1+3V3dg7k5rr72q7njDH95at3lHOLPhz/le9qoZ6wnfxbBnw71QwN/e2reHc6OmdE/W6Wl1rS4exPRn0LtvbviX/Vo8QIty9Jz
+   eJzt2ukKgzAQReG8/9tKfYAitOASl8nVZCaeA/lZST/UscuQUhpY0qKy8NPCTws/Lfy0evRj/sYJP63afuNsleTt2vGwh8jhp4WfFn5a+G0b0/U559XP04w9yvv+vIefVm2/p69Jy73rjjj/tPDTwk8LPy0PfhGe8/aKsu875+r6WMrxovh5DT8t/LRq+kWeE3v19n5qh98y61zuyU95Hsk901w5Xms/D/fEv9HntyyGrffeurnd2TmYM8TPtta92c9qlzPEL4af8nvaU9/HR/LzGH56zA8t/JZZPjscvebNz88ls6bEbqpHPyXrudviv+q9rS9xMsUb
   </data>
  </layer>
  <layer name="TileObjects" width="80" height="45">
   <data encoding="base64" compression="zlib">
-   eJzt0zsKgDAQBUCv4ucCinoBC73/iRRUCClECz+RGVj2kTSv2SwD/mA8+Jsea7E66sK31EFugtw+XSRRxYm8y2/uAgAAAAAAkKohGiAd7hcAAAA4o9t2/2qLNJTLVNFbEW24agZQQQUD
+   eJzt10sOgyAUBVC24mcDrZ8NOLD7X1EdaIIkbXCgDfWc5IULE14YPUIA4E66KD+i/Ixyf1EvJaoP5k11Tjs7c7J/XXAnEMKUUXzm/QCA0uTML7kFAADwjX8FAMC9mP8AgH82rOv40y7K0CzVJmd1ssJRb1qzEV4=
   </data>
  </layer>
 </map>
