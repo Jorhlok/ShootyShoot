@@ -32,7 +32,7 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
         if (deltatime < FrameThreshold) Here?.update(deltatime)
         else {
             Here?.update(FrameThreshold)
-            System.err.println("Whoa, a frame took ${deltatime}s which is waaaaay longer than the threshold of ${FrameThreshold}s.\n" +
+            System.err.println("Whoa, a frame took ${deltatime}s which is waaaaay longer than the threshold of ${FrameThreshold}s. " +
                     "Physics surely would have broken down had I let this frame run.")
         }
     }

@@ -3,11 +3,8 @@ package net.jorhlok.shootyshoot
 import com.badlogic.gdx.math.Vector2
 import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
-import net.jorhlok.oops.Entity
 
-class TestPlatformer(
-            var MGR: MultiGfxRegister,
-            var MAR: MultiAudioRegister) : Entity() {
+class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(MGR, MAR) {
     var Gravity = Vector2(0f, -24f)
     var Grounded = false
     var JumpVelo = 24f

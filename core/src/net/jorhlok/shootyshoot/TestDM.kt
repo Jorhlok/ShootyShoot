@@ -3,8 +3,8 @@ package net.jorhlok.shootyshoot
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.math.Vector2
 import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
 import net.jorhlok.oops.DungeonMaster
@@ -19,6 +19,38 @@ class TestDM(mapname: String,
     var Player: TestPlatformer? = null
 
     override fun begin() {
+        val LyrTileObj = Level!!.layers["TileObjects"] as TiledMapTileLayer
+        for (y in 0..LyrTileObj.height-1)
+            for (x in 0..LyrTileObj.width-1) {
+                val obj = LyrTileObj.getCell(x,y)
+//                System.out.println("${obj?.tile?.id}")
+                if (obj != null && obj.tile != null) when (obj.tile.id) {
+                    //49-54 objects
+                    //71 black box
+                    //72 moving
+                    Door.TileNum -> {
+                        val o = Door(MGR,MAR)
+                        o.Position.set(x.toFloat(),y.toFloat())
+                        Living.add(o)
+                    }
+                    Pedestal.TileNum -> {
+                        val o = Pedestal(MGR,MAR)
+                        o.Position.set(x.toFloat(),y.toFloat())
+                        Living.add(o)
+                    }
+                    Alchemy.TileNum -> {
+                        val o = Alchemy(MGR,MAR)
+                        o.Position.set(x.toFloat(),y.toFloat())
+                        Living.add(o)
+                    }
+                    ThruPlat.TileNum -> {
+                        val o = ThruPlat(MGR,MAR)
+                        o.Position.set(x.toFloat(),y.toFloat())
+                        Living.add(o)
+                    }
+                }
+            }
+
         MGR.setBufScalar("main",1/16f)
         cam = MGR.getBufCam("main")!!
         cam.setToOrtho(false,640/16f,360/16f)
