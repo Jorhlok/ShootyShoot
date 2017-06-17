@@ -15,7 +15,7 @@ class Collectible(val anim: String, x: Float, y:Float, MGR: MultiGfxRegister, MA
 
     init {
         Position.set(x,y)
-        AABB.set(2/16f,2/16f,12/16f,12/16f)
+        AABB.set(0f,0f,1f,1f)
         val s = HashSet<String>()
         s.add("TestPlatformer")
         CollEntWhite = s
@@ -26,7 +26,7 @@ class Collectible(val anim: String, x: Float, y:Float, MGR: MultiGfxRegister, MA
         for (m in Mailbox) {
             if (hidetime >= hidelen && m.label.startsWith("CollEnt/")) {
                 hidetime = deltatime*-1
-                statetime = hidetime
+                statetime = hidetime-hidelen
                 MAR.playSFX("pew")
             }
         }

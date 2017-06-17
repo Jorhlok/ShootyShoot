@@ -5,10 +5,10 @@ import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
 import net.jorhlok.oops.Entity
 
-class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(MGR, MAR) {
+class TestPlatformer(val DM: TestDM, MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(MGR, MAR) {
     var Gravity = Vector2(0f, -24f)
     var Grounded = false
-    var JumpVelo = 24f
+    var JumpVelo = 12f
     var WalkVelo = 16f
     var WalkAccl = 16f
 
@@ -33,10 +33,13 @@ class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(
         Physics = true
         CollTiles = true
         CollEntities = true
-        val s = HashSet<String>()
-        s.add(ThruPlat.TypeName)
-        CollEntAsTile = s
-        CollEntGray = s
+        val ceg = HashSet<String>()
+        val ceat = HashSet<String>()
+        ceat.add(ThruPlat.TypeName)
+        CollEntAsTile = ceat
+        ceg.add(ThruPlat.TypeName)
+        ceg.add(Door.TypeName)
+        CollEntGray = ceg
         Type = "TestPlatformer"
     }
 
@@ -87,14 +90,18 @@ class TestPlatformer(MGR: MultiGfxRegister, MAR: MultiAudioRegister) : SSEntity(
         if (Velocity.y < 0)
             Grounded = false
         else if (Velocity.y == 0f) Grounded = true
-//        for (m in Mailbox) {
+        for (m in Mailbox) {
+            when {
+                m.label.startsWith("CollEnt/${Door.TypeName}") -> DM.Parent?.launchScript("title")
+            }
 //            System.out.println(m.label)
-//        }
+        }
     }
 
     override fun checkCollEntity(deltatime: Float, e: Entity): Boolean {
         when(e.Type) {
             ThruPlat.TypeName -> return !forcefall && Velocity.y <= 0 && Position.y >= e.Position.y && mkVRect().overlaps(e.mkRect())
+            Door.TypeName -> return forcefall
         }
         return false
     }

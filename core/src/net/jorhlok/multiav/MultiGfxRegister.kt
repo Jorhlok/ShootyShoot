@@ -245,7 +245,7 @@ class MultiGfxRegister {
     fun drawGlyphLayout(font: String, lay: GlyphLayout, x: Float, y: Float, sw: Float = 1f, sh: Float = 1f, rot: Float = 0f, center: Vector2 = Vector2(0.5f,0.5f), col: Color = Color(1f,1f,1f,1f)) {
         drawingSprite()
         val f = fonts[font]
-        var sampling = fontsampling[font]!!
+        var sampling = fontsampling[font]
         if (f != null && sampling!= null && batch != null) {
             sampling *= scalarCurrent
             val begin = Vector2(x-lay.width*center.x,y+f.lineHeight+lay.height*center.y)
@@ -552,6 +552,15 @@ class MultiGfxRegister {
             drawingOff()
             buffers[mybuf]?.end()
             camera.update()
+            batch!!.projectionMatrix = camera.combined
+            shape!!.projectionMatrix = camera.combined
+            scalarCurrent = scalar
+        }
+    }
+
+    fun updateCam() {
+        camera.update()
+        if (mybuf == "") {
             batch!!.projectionMatrix = camera.combined
             shape!!.projectionMatrix = camera.combined
             scalarCurrent = scalar

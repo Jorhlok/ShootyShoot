@@ -3,15 +3,14 @@ package net.jorhlok.shootyshoot
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
-import net.jorhlok.oops.LabelledObject
 import net.jorhlok.oops.ObjectOrientedPlaySet
 
 
@@ -37,8 +36,6 @@ class ShootyShoot : ApplicationAdapter() {
         audio = MultiAudioRegister()
         mkav()
         mgr!!.Generate()
-        mgr!!.camera.setToOrtho(false,640f,360f)
-        mgr!!.camera.update()
         audio!!.Generate()
 
         oops = ObjectOrientedPlaySet()
@@ -47,8 +44,9 @@ class ShootyShoot : ApplicationAdapter() {
         oops!!.addTileMap("test2", TmxMapLoader(InternalFileHandleResolver()).load("map/test2.tmx"))
 
         val dm = TestDM("test2",mgr!!,audio!!)
+        oops!!.addMasterScript("title", Title("",mgr!!,audio!!))
         oops!!.addMasterScript("testdm", dm)
-        oops!!.launchScript("testdm")
+        oops!!.launchScript("title")
     }
 
 
@@ -119,7 +117,7 @@ class ShootyShoot : ApplicationAdapter() {
         mgr?.newMapTileRgb("sprites",244,"_greyblock")
 
         audio?.newMusic("frcasio", "bgm/FriendlyCasiotone.ogg")
-        audio?.newMusic("mkds", "bgm/mkdsintro.ogg", "bgm/mkds.ogg")
+//        audio?.newMusic("mkds", "bgm/mkdsintro.ogg", "bgm/mkds.ogg")
 
         audio?.newSFX("pew", "sfx/pew.wav")
         audio?.newSFX("jump", "sfx/jump.wav")

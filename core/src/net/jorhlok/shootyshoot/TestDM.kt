@@ -23,9 +23,7 @@ class TestDM(mapname: String,
         if (LyrTileObj != null) for (y in 0..LyrTileObj.height-1)
             for (x in 0..LyrTileObj.width-1) {
                 val obj = LyrTileObj.getCell(x,y)
-//                System.out.println("${obj?.tile?.id}")
                 if (obj != null && obj.tile != null) when (obj.tile.id) {
-                    //49-54 objects
                     //71 black box
                     //72 moving
                     Door.TileNum -> {
@@ -57,6 +55,8 @@ class TestDM(mapname: String,
                 }
             }
 
+        MGR.camera.setToOrtho(false,640f,360f)
+        MGR.updateCam()
         MGR.setBufScalar("main",1/16f)
         cam = MGR.getBufCam("main")!!
         cam.setToOrtho(false,640/16f,360/16f)
@@ -64,11 +64,26 @@ class TestDM(mapname: String,
 
         MAR.setMusVolume(0.125f)
         MAR.setSFXVolume(0.25f)
+        val m = MAR.getMus("frcasio")
+        if (m != null) {
+            m.Generate()
+            m.play(true)
+        }
 
-        Player = TestPlatformer(MGR,MAR)
+        Player = TestPlatformer(this,MGR,MAR)
         Player!!.Parent = this
         Player!!.Name = "Player"
         Living.add(Player!!)
+    }
+
+    override fun end() {
+        val m = MAR.getMus("frcasio")
+        if (m != null) {
+            m.stop()
+            m.dispose()
+        }
+        Living.clear()
+        Player = null
     }
 
     override fun prestep(deltaTime: Float) {
@@ -109,7 +124,6 @@ class TestDM(mapname: String,
             e.draw(deltatime)
         }
         MGR.stopBuffer()
-        MGR.clear()
         MGR.drawBuffer("main")
         MGR.flush()
     }
