@@ -73,9 +73,9 @@ open class Entity {
         AOI.merge(mkRect())
     }
 
-    fun collideWithTiles(deltaTime: Float) {
+    fun collideWithTiles() {
         if (Physics && CollQueue.isNotEmpty()) {
-            var len = CollQueue.size
+            val len = CollQueue.size
             PrePosition.set(Position)
 
             //check tiles for collisions and make adjustments

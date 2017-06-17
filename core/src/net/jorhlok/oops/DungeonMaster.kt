@@ -11,26 +11,22 @@ import java.util.Queue
  * The master script in a room.
  * @author Jorhlok
  */
-open class DungeonMaster{
+open class DungeonMaster(
+        var MapName: String,
+        var StrTerrain: String = "Terrain") {
+
     interface OOPS {
         val GlobalData: MutableMap<String, LabelledObject>
         fun launchScript(key: String)
     }
-
-    //setup
-    var MapName = ""
-    var StrTerrain = "Terrain"
 
     //runtime
     var Parent: OOPS? = null
     var Level: TiledMap? = null
     var LyrTerrain: TiledMapTileLayer? = null
     var Living: LinkedList<Entity> = LinkedList()
-
-    constructor(mapname: String, terr: String? = null) {
-        MapName = mapname
-        if (terr != null) StrTerrain = terr
-    }
+    var TileW = 1f
+    var TileH = 1f
 
     fun create(maps: Map<String, TiledMap>, parent: OOPS) {
         Parent = parent
@@ -81,7 +77,7 @@ open class DungeonMaster{
             if (obj.CollTiles) {
                 CollectTiles(q, obj.AOI)
                 for (o in q) {
-                    val tile = o.obj as Array<Any>
+                    val tile = o.obj as Array<*>
                     val c = tile[0] as TiledMapTileLayer.Cell
                     val r = tile[1] as Rectangle
                     if (obj.CollTileWhite == null && obj.CollTileGray == null ||
@@ -94,7 +90,7 @@ open class DungeonMaster{
             }
         }
 
-        for (e in Living) e.collideWithTiles(deltatime)
+        for (e in Living) e.collideWithTiles()
         for (e in Living) e.poststep(deltatime)
         poststep(deltatime)
         for (e in Living) {
@@ -116,14 +112,14 @@ open class DungeonMaster{
         for (y in y1..y2) {
             for (x in x1..x2) {
                 val c = LyrTerrain?.getCell(x, y)
-                if (c != null && c.tile != null) //TODO: px->world
-                    q.add(LabelledObject("Tile",arrayOf(c,Rectangle(x.toFloat(),y.toFloat(),1f,1f)))) //LyrTerrain!!.tileWidth,LyrTerrain!!.tileHeight))))
+                if (c != null && c.tile != null) //TODO: px->world auto?
+                    q.add(LabelledObject("Tile",arrayOf(c,Rectangle(x.toFloat(),y.toFloat(),TileW,TileH)))) //LyrTerrain!!.tileWidth,LyrTerrain!!.tileHeight))))
             }
         }
     }
 
     fun keepPointInBox(pt: Vector2, box: Rectangle): Vector2 {
-        var ret = Vector2(pt)
+        val ret = Vector2(pt)
         if (!box.contains(pt)) {
             if (pt.x < box.x) ret.x = box.x
             else if (pt.x > box.x + box.width) ret.x = box.x + box.width

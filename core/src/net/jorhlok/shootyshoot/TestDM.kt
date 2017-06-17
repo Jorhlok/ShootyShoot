@@ -48,6 +48,12 @@ class TestDM(mapname: String,
                         o.Position.set(x.toFloat(),y.toFloat())
                         Living.add(o)
                     }
+                    49 -> Living.add(Collectible("_mineral",x.toFloat(),y.toFloat(),MGR,MAR))
+                    50 -> Living.add(Collectible("_herb",x.toFloat(),y.toFloat(),MGR,MAR))
+                    51 -> Living.add(Collectible("_eyeball",x.toFloat(),y.toFloat(),MGR,MAR))
+                    52 -> Living.add(Collectible("_worm",x.toFloat(),y.toFloat(),MGR,MAR))
+                    53 -> Living.add(Collectible("_dollar",x.toFloat(),y.toFloat(),MGR,MAR))
+                    54 -> Living.add(Collectible("_potion",x.toFloat(),y.toFloat(),MGR,MAR))
                 }
             }
 
