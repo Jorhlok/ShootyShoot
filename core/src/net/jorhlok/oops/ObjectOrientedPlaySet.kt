@@ -18,6 +18,7 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
 
     //runtime
     var Here: DungeonMaster? = null
+    var Launch = ""
 
     fun addTileMap(key: String, map: TiledMap) {
         TileMap.put(key, map)
@@ -35,6 +36,19 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
             System.err.println("Whoa, a frame took ${deltatime}s which is waaaaay longer than the threshold of ${FrameThreshold}s. " +
                     "Physics surely would have broken down had I let this frame run.")
         }
+        if (Launch != "") {
+            val newscript = MasterScript[Launch]
+            Launch = ""
+            if (newscript != null) {
+                if (Here != null) {
+                    Here!!.end()
+                    Here!!.dispose()
+                }
+                Here = newscript
+                Here!!.create(TileMap,this)
+                Here!!.begin()
+            }
+        }
     }
 
     fun draw(deltatime: Float) {
@@ -42,15 +56,7 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     }
 
     override fun launchScript(key: String) {
-        if (Here != null) {
-            Here!!.end()
-            Here!!.dispose()
-        }
-        Here = MasterScript[key]
-        if (Here != null) {
-            Here!!.create(TileMap,this)
-            Here!!.begin()
-        }
+        Launch = key
     }
 
     fun dispose() {
