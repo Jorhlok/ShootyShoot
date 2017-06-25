@@ -138,12 +138,12 @@ open class Entity {
     fun mkRect(aabb: Rectangle, pos: Vector2) = Rectangle(aabb.x+pos.x,aabb.y+pos.y,aabb.width,aabb.height)
 
     fun mkVRect(aabb: Rectangle, tol: Vector2) = Rectangle(aabb.x + (aabb.width - aabb.width * tol.x) / 2,
-                                                            aabb.y,
-                                                            aabb.width * tol.x,
-                                                            aabb.height)
+            aabb.y,
+            aabb.width * tol.x,
+            aabb.height)
 
     fun mkHRect(aabb: Rectangle, tol: Vector2) = Rectangle(aabb.x,
-                                                            aabb.y + (aabb.height - aabb.height * tol.y) / 2,
-                                                            aabb.width,
-                                                            aabb.height * tol.y)
+            aabb.y + (aabb.height - aabb.height * tol.y) / 2,
+            aabb.width,
+            aabb.height * tol.y)
 }

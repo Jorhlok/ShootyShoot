@@ -38,8 +38,8 @@ open class DungeonMaster(
     open fun end() {}
     open fun dispose() {}
 
-    open fun prestep(deltaTime: Float) {}
-    open fun poststep(deltaTime: Float) {}
+    open fun prestep(deltatime: Float) {}
+    open fun poststep(deltatime: Float) {}
 
     fun update(deltatime: Float) {
         prestep(deltatime)
@@ -56,7 +56,7 @@ open class DungeonMaster(
                     if (e.CollEntities && e.AOI.overlaps(obj.AOI)) {
                         if (obj.CollEntWhite == null && obj.CollEntGray == null ||
                                 obj.CollEntWhite != null && e.Type in obj.CollEntWhite!! ||
-                                    obj.CollEntGray != null && e.Type in obj.CollEntGray!!
+                                obj.CollEntGray != null && e.Type in obj.CollEntGray!!
                                         && obj.checkCollEntity(deltatime,e)) {
                             obj.Mailbox.add(LabelledObject("CollEnt/${e.Type}", e))
                             if (obj.CollEntAsTile != null && e.Type in obj.CollEntAsTile!!)
@@ -65,7 +65,7 @@ open class DungeonMaster(
 
                         if (e.CollEntWhite == null && e.CollEntGray == null ||
                                 e.CollEntWhite != null && obj.Type in e.CollEntWhite!! ||
-                                    e.CollEntGray != null && obj.Type in e.CollEntGray!!
+                                e.CollEntGray != null && obj.Type in e.CollEntGray!!
                                         && e.checkCollEntity(deltatime,obj)) {
                             e.Mailbox.add(LabelledObject("CollEnt/${obj.Type}", obj))
                             if (e.CollEntAsTile != null && obj.Type in e.CollEntAsTile!!)
@@ -82,7 +82,7 @@ open class DungeonMaster(
                     val r = tile[1] as Rectangle
                     if (obj.CollTileWhite == null && obj.CollTileGray == null ||
                             obj.CollTileWhite != null && c.tile.id in obj.CollTileWhite!! ||
-                                obj.CollTileGray != null && c.tile.id in obj.CollTileGray!! &&
+                            obj.CollTileGray != null && c.tile.id in obj.CollTileGray!! &&
                                     obj.checkCollTile(deltatime,c,r.x.toInt(),r.y.toInt()))
                         obj.CollQueue.add(LabelledObject("Tile/${c.tile.id}",r))
                 }

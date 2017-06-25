@@ -20,7 +20,7 @@ class Title(mapname: String,
         MGR.setBufScalar("main")
     }
 
-    override fun prestep(deltaTime: Float) {
+    override fun prestep(deltatime: Float) {
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.ENTER))
             this.Parent?.launchScript("testdm")

@@ -86,7 +86,7 @@ class TestDM(mapname: String,
         Player = null
     }
 
-    override fun prestep(deltaTime: Float) {
+    override fun prestep(deltatime: Float) {
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.UP)
                 || Gdx.input.isKeyPressed(Input.Keys.W))
             Player!!.Mailbox.add(LabelledObject("CtrlJump",true))

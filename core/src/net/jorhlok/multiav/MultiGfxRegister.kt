@@ -6,16 +6,13 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.*
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
-import com.badlogic.gdx.maps.tiled.renderers.BatchTiledMapRenderer
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Array
-import java.util.HashMap
+import java.util.*
 
 /**
  * Multi-Function Audio-Visual Organization Engine
@@ -363,14 +360,14 @@ class MultiGfxRegister {
     }
 
     fun drawRect(x: Float, y: Float, originX: Float, originY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float,
-             degrees: Float, col: Color? = null) {
+                 degrees: Float, col: Color? = null) {
         drawingShape()
         if (col != null) shape?.color = col
         shape?.rect(x,y,originX,originY,width,height,scaleX,scaleY,degrees)
     }
 
     fun drawRect(x: Float, y: Float, originX: Float, originY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float,
-             degrees: Float, col1: Color, col2: Color, col3: Color, col4: Color) {
+                 degrees: Float, col1: Color, col2: Color, col3: Color, col4: Color) {
         shape?.rect(x,y,originX,originY,width,height,scaleX,scaleY,degrees,col1,col2,col3,col4)
 
     }
@@ -639,7 +636,3 @@ class MultiGfxRegister {
         }
     }
 }
-
-
-
-
