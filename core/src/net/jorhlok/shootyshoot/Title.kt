@@ -23,7 +23,7 @@ class Title(mapname: String,
     override fun prestep(deltatime: Float) {
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.ENTER))
-            this.Parent?.launchScript("testdm")
+            ScriptSwap = "testdm"
     }
 
     override fun draw(deltatime: Float) {
@@ -34,4 +34,6 @@ class Title(mapname: String,
         MGR.drawBuffer("main")
         MGR.flush()
     }
+
+    override fun clone() = Title(MapName,MGR,MAR)
 }

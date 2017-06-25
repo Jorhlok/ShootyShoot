@@ -1,7 +1,7 @@
 package net.jorhlok.oops
 
 import com.badlogic.gdx.maps.tiled.TiledMap
-import java.util.HashMap
+import java.util.*
 
 /**
  * Object Oriented Gameplay Setup
@@ -10,6 +10,7 @@ import java.util.HashMap
  * @author Jorhlok
  */
 class ObjectOrientedPlaySet : DungeonMaster.OOPS {
+
     //setup
     var TileMap: MutableMap<String, TiledMap> = HashMap()
     var MasterScript: MutableMap<String, DungeonMaster> = HashMap()
@@ -18,8 +19,8 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     var SwitchAfterDraw = true
 
     //runtime
-    var Here: DungeonMaster? = null
-    var Launch = ""
+    var CallStack = LinkedList<DungeonMaster>()
+    var iter: ListIterator<DungeonMaster>? = null
 
     fun addTileMap(key: String, map: TiledMap) {
         TileMap.put(key, map)
@@ -31,9 +32,9 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     }
 
     fun step(deltatime: Float) {
-        if (deltatime < FrameThreshold) Here?.update(deltatime)
+        if (deltatime < FrameThreshold) CallStack.first.update(deltatime)
         else {
-            Here?.update(FrameThreshold)
+            CallStack.first.update(FrameThreshold)
             System.err.println("Whoa, a frame took ${deltatime}s which is waaaaay longer than the threshold of ${FrameThreshold}s. " +
                     "Physics surely would have broken down had I let this frame run.")
         }
@@ -41,34 +42,66 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     }
 
     fun switch() {
-        if (Launch != "") {
-            val newscript = MasterScript[Launch]
-            Launch = ""
-            if (newscript != null) {
-                if (Here != null) {
-                    Here!!.end()
-                    Here!!.dispose()
+        while (CallStack.size > 0) {
+            var first = CallStack.first
+            val stop = first.ScriptStop
+            val swap = MasterScript[first.ScriptSwap]
+            if (stop) {
+                first.end()
+                first.dispose()
+                CallStack.pop()
+                if (CallStack.size > 0) {
+                    CallStack.first.unpause()
                 }
-                Here = newscript
-                Here!!.create(TileMap,this)
-                Here!!.begin()
+            } else if (swap != null) {
+                first.end()
+                first.dispose()
+                CallStack.pop()
+                CallStack.push(swap.clone())
+                first = CallStack.first
+                first.create(TileMap,this)
+                first.begin()
+            } else {
+                val launch = MasterScript[first.ScriptLaunch]
+                if (launch != null) {
+                    first.pause()
+                    CallStack.push(launch.clone())
+                    first = CallStack.first
+                    first.create(TileMap,this)
+                    first.begin()
+                }
+                break
             }
         }
     }
 
     fun draw(deltatime: Float) {
-        if (Here != null) Here!!.draw(deltatime)
+        iter = CallStack.listIterator()
+        iter!!.next().draw(deltatime)
+        iter = null
+        CallStack.first.flip()
         if (SwitchAfterDraw) switch()
     }
 
-    override fun launchScript(key: String) {
-        Launch = key
+    override fun drawPrevious(deltatime: Float) {
+            iter?.next()?.draw(deltatime)
+    }
+
+    fun launchScript(key: String) {
+        if (CallStack.isEmpty()) {
+            val s = MasterScript[key]
+            if (s != null) {
+                CallStack.add(s.clone())
+                s.begin()
+            }
+        }
     }
 
     fun dispose() {
-        if (Here != null) {
-            Here!!.end()
-            Here!!.dispose()
+        while (CallStack.size > 0) {
+            val s = CallStack.pop()
+            s.end()
+            s.dispose()
         }
         for (t in TileMap.values) {
             t.dispose()

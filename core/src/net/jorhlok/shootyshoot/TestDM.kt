@@ -13,6 +13,7 @@ import net.jorhlok.oops.LabelledObject
 class TestDM(mapname: String,
              var MGR: MultiGfxRegister,
              var MAR: MultiAudioRegister) : DungeonMaster(mapname) {
+
     var cam = OrthographicCamera()
     var cambounds = Rectangle()
     var statetime = 0f
@@ -127,4 +128,6 @@ class TestDM(mapname: String,
         MGR.drawBuffer("main")
         MGR.flush()
     }
+
+    override fun clone() = TestDM(MapName,MGR,MAR)
 }

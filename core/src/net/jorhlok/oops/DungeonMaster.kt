@@ -11,14 +11,21 @@ import java.util.Queue
  * The master script in a room.
  * @author Jorhlok
  */
-open class DungeonMaster(
+abstract class DungeonMaster(
         var MapName: String,
         var StrTerrain: String = "Terrain") {
 
     interface OOPS {
         val GlobalData: MutableMap<String, LabelledObject>
-        fun launchScript(key: String)
+        fun drawPrevious(deltatime: Float) //only call this a single time inside the draw function
     }
+    //launchairs
+    open var ScriptLaunch = ""
+            get() = field
+    open var ScriptSwap = ""
+        get() = field
+    open var ScriptStop = false
+        get() = field
 
     //runtime
     var Parent: OOPS? = null
@@ -35,6 +42,8 @@ open class DungeonMaster(
     }
 
     open fun begin() {}
+    open fun pause() {}
+    open fun unpause() {}
     open fun end() {}
     open fun dispose() {}
 
@@ -99,9 +108,9 @@ open class DungeonMaster(
         }
     }
 
-    open fun draw(deltatime: Float) {
+    open fun draw(deltatime: Float) {}
 
-    }
+    open fun flip() {}
 
     fun CollectTiles(q: Queue<LabelledObject>, aoi: Rectangle) {
         val x1 = Math.floor(aoi.x.toDouble()).toInt()
@@ -128,5 +137,7 @@ open class DungeonMaster(
         }
         return ret
     }
+
+    abstract fun clone(): DungeonMaster
 
 }

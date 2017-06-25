@@ -92,7 +92,7 @@ class TestPlatformer(val DM: TestDM, MGR: MultiGfxRegister, MAR: MultiAudioRegis
         else if (Velocity.y == 0f) Grounded = true
         for (m in Mailbox) {
             when {
-                m.label.startsWith("CollEnt/${Door.TypeName}") -> DM.Parent?.launchScript("title")
+                m.label.startsWith("CollEnt/${Door.TypeName}") -> DM.ScriptSwap = "title"
             }
 //            System.out.println(m.label)
         }
