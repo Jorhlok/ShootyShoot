@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Rectangle
+import net.jorhlok.multiav.MTrack
 import net.jorhlok.multiav.MultiAudioRegister
 import net.jorhlok.multiav.MultiGfxRegister
 import net.jorhlok.oops.DungeonMaster
@@ -13,6 +14,8 @@ import net.jorhlok.oops.LabelledObject
 class TestDM(mapname: String,
              var MGR: MultiGfxRegister,
              var MAR: MultiAudioRegister) : DungeonMaster(mapname) {
+
+    var muz: MTrack? = null
 
     var cam = OrthographicCamera()
     var cambounds = Rectangle()
@@ -65,11 +68,9 @@ class TestDM(mapname: String,
 
         MAR.setMusVolume(0.125f)
         MAR.setSFXVolume(0.25f)
-        val m = MAR.getMus("frcasio")
-        if (m != null) {
-            m.Generate()
-            m.play(true)
-        }
+        muz = MAR.getMus("frcasio")
+        muz?.Generate()
+        muz?.play(true)
 
         Player = TestPlatformer(this,MGR,MAR)
         Player!!.Parent = this
@@ -78,11 +79,8 @@ class TestDM(mapname: String,
     }
 
     override fun end() {
-        val m = MAR.getMus("frcasio")
-        if (m != null) {
-            m.stop()
-            m.dispose()
-        }
+        muz?.stop()
+        muz?.dispose()
         Living.clear()
         Player = null
     }
@@ -125,8 +123,21 @@ class TestDM(mapname: String,
             e.draw(deltatime)
         }
         MGR.stopBuffer()
+//        MGR.drawBuffer("main")
+//        MGR.flush()
+    }
+
+    override fun flip() {
         MGR.drawBuffer("main")
         MGR.flush()
+    }
+
+    override fun pause() {
+        muz?.stop()
+    }
+
+    override fun unpause() {
+        muz?.play(true)
     }
 
     override fun clone() = TestDM(MapName,MGR,MAR)

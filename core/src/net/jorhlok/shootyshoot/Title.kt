@@ -31,6 +31,11 @@ class Title(mapname: String,
         MGR.clear(0.1f,0.1f,0.1f,1f)
         MGR.drawString("libmono","Press Start",320f,180.5f)
         MGR.stopBuffer()
+//        MGR.drawBuffer("main")
+//        MGR.flush()
+    }
+
+    override fun flip() {
         MGR.drawBuffer("main")
         MGR.flush()
     }
