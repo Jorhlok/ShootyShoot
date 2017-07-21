@@ -21,6 +21,7 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     //runtime
     var CallStack = LinkedList<DungeonMaster>()
     var iter: ListIterator<DungeonMaster>? = null
+    var Quit = false
 
     fun addTileMap(key: String, map: TiledMap) {
         TileMap.put(key, map)
@@ -42,7 +43,7 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
     }
 
     fun switch() {
-        while (CallStack.size > 0) {
+        while (CallStack.isNotEmpty()) {
             var first = CallStack.first
             val stop = first.ScriptStop
             val swap = MasterScript[first.ScriptSwap]
@@ -64,6 +65,7 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
             } else {
                 val launch = MasterScript[first.ScriptLaunch]
                 if (launch != null) {
+                    first.ScriptLaunch = ""
                     first.pause()
                     CallStack.push(launch.clone())
                     first = CallStack.first
@@ -72,6 +74,9 @@ class ObjectOrientedPlaySet : DungeonMaster.OOPS {
                 }
                 break
             }
+        }
+        if (CallStack.isEmpty()) {
+            Quit = true
         }
     }
 

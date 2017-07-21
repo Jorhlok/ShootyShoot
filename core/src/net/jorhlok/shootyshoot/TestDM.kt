@@ -21,6 +21,7 @@ class TestDM(mapname: String,
     var cambounds = Rectangle()
     var statetime = 0f
     var Player: TestPlatformer? = null
+    var enter = true
 
     override fun begin() {
         val LyrTileObj = Level!!.layers["TileObjects"] as TiledMapTileLayer?
@@ -86,6 +87,10 @@ class TestDM(mapname: String,
     }
 
     override fun prestep(deltatime: Float) {
+        if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+            if (enter == false) ScriptLaunch = "pause"
+            enter = true
+        } else enter = false
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.UP)
                 || Gdx.input.isKeyPressed(Input.Keys.W))
             Player!!.Mailbox.add(LabelledObject("CtrlJump",true))
@@ -134,10 +139,19 @@ class TestDM(mapname: String,
 
     override fun pause() {
         muz?.stop()
+        muz?.dispose()
     }
 
     override fun unpause() {
+        val quitting = Parent!!.GlobalData["quitting"]
+        if (quitting != null && quitting.label != "") ScriptStop = true
+        muz?.Generate()
         muz?.play(true)
+        MGR.camera.setToOrtho(false,640f,360f)
+        MGR.updateCam()
+        MGR.setBufScalar("main",1/16f)
+        cam = MGR.getBufCam("main")!!
+        cam.setToOrtho(false,640/16f,360/16f)
     }
 
     override fun clone() = TestDM(MapName,MGR,MAR)

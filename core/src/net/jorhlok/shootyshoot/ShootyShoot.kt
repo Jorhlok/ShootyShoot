@@ -45,6 +45,7 @@ class ShootyShoot : ApplicationAdapter() {
 
         val dm = TestDM("test2",mgr!!,audio!!)
         oops!!.addMasterScript("title", Title("",mgr!!,audio!!))
+        oops!!.addMasterScript("pause", PauseDM("",mgr!!,audio!!))
         oops!!.addMasterScript("testdm", dm)
         oops!!.launchScript("title")
     }
@@ -78,6 +79,7 @@ class ShootyShoot : ApplicationAdapter() {
             System.err.println("Error drawing!")
             e.printStackTrace()
         }
+        if (oops!!.Quit) Gdx.app.exit()
 
 //        mgr!!.drawPal("_girl",4,0f,64f,64f,2f,2f,statetime*90, Vector2())
 //        mgr!!.drawPal("_girl",0,0f,16f,16f,2f,2f,statetime*90)

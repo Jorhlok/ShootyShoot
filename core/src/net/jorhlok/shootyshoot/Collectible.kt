@@ -31,11 +31,11 @@ class Collectible(val anim: String, x: Float, y:Float, MGR: MultiGfxRegister, MA
             }
         }
         if (hidetime < hidelen) hidetime += deltatime
-        statetime += deltatime
-        if (statetime > animlen) statetime -= animlen
     }
 
     override fun draw(deltatime: Float) {
+        statetime += deltatime
+        if (statetime > animlen) statetime -= animlen
         if (hidetime >= hidelen) MGR.drawRgb(anim,0f,Position.x+0.5f,Position.y+0.5f+Math.sin(statetime/animlen*Math.PI*2).toFloat()*hoverdepth)
     }
 }
